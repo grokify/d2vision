@@ -1,7 +1,12 @@
 # d2vision
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/grokify/d2vision.svg)](https://pkg.go.dev/github.com/grokify/d2vision)
-[![Go Report Card](https://goreportcard.com/badge/github.com/grokify/d2vision)](https://goreportcard.com/report/github.com/grokify/d2vision)
+[![Go CI][go-ci-svg]][go-ci-url]
+[![Go Lint][go-lint-svg]][go-lint-url]
+[![Go SAST][go-sast-svg]][go-sast-url]
+[![Go Report Card][goreport-svg]][goreport-url]
+[![Docs][docs-godoc-svg]][docs-godoc-url]
+[![Visualization][viz-svg]][viz-url]
+[![License][license-svg]][license-url]
 
 Tools for [D2](https://d2lang.com) diagram parsing, generation, and AI-assisted creation.
 
@@ -520,3 +525,20 @@ The generator converts `DiagramSpec` to D2 code, handling:
 ## License
 
 MIT
+
+ [go-ci-svg]: https://github.com/grokify/d2vision/actions/workflows/go-ci.yaml/badge.svg?branch=main
+ [go-ci-url]: https://github.com/grokify/d2vision/actions/workflows/go-ci.yaml
+ [go-lint-svg]: https://github.com/grokify/d2vision/actions/workflows/go-lint.yaml/badge.svg?branch=main
+ [go-lint-url]: https://github.com/grokify/d2vision/actions/workflows/go-lint.yaml
+ [go-sast-svg]: https://github.com/grokify/d2vision/actions/workflows/go-sast-codeql.yaml/badge.svg?branch=main
+ [go-sast-url]: https://github.com/grokify/d2vision/actions/workflows/go-sast-codeql.yaml
+ [goreport-svg]: https://goreportcard.com/badge/github.com/grokify/d2vision
+ [goreport-url]: https://goreportcard.com/report/github.com/grokify/d2vision
+ [docs-godoc-svg]: https://pkg.go.dev/badge/github.com/grokify/d2vision
+ [docs-godoc-url]: https://pkg.go.dev/github.com/grokify/d2vision
+ [viz-svg]: https://img.shields.io/badge/visualizaton-Go-blue.svg
+ [viz-url]: https://mango-dune-07a8b7110.1.azurestaticapps.net/?repo=grokify%2Fd2vision
+ [loc-svg]: https://tokei.rs/b1/github/grokify/d2vision
+ [repo-url]: https://github.com/grokify/d2vision
+ [license-svg]: https://img.shields.io/badge/license-MIT-blue.svg
+ [license-url]: https://github.com/grokify/d2vision/blob/master/LICENSE
