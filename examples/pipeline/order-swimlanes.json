@@ -1,0 +1,58 @@
+{
+  "id": "order-processing",
+  "label": "Order Processing",
+  "direction": "right",
+  "stages": [
+    {
+      "id": "receive",
+      "label": "Receive Order",
+      "lane": "Sales",
+      "executor": {
+        "name": "order-api",
+        "type": "api"
+      },
+      "outputs": [
+        {"id": "order", "label": "Order", "kind": "data"}
+      ]
+    },
+    {
+      "id": "validate",
+      "label": "Validate Order",
+      "lane": "Sales",
+      "executor": {
+        "name": "validator",
+        "type": "deterministic"
+      }
+    },
+    {
+      "id": "charge",
+      "label": "Process Payment",
+      "lane": "Finance",
+      "executor": {
+        "name": "payment-api",
+        "type": "api"
+      },
+      "outputs": [
+        {"id": "receipt", "label": "Receipt", "kind": "artifact"}
+      ]
+    },
+    {
+      "id": "fulfill",
+      "label": "Fulfill Order",
+      "lane": "Warehouse",
+      "executor": {
+        "name": "fulfillment-api",
+        "type": "api"
+      }
+    },
+    {
+      "id": "notify",
+      "label": "Send Confirmation",
+      "lane": "Sales",
+      "executor": {
+        "name": "email-service",
+        "type": "api"
+      }
+    }
+  ]
+}

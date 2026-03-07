@@ -1,0 +1,51 @@
+{
+  "id": "etl-pipeline",
+  "label": "ETL Pipeline",
+  "direction": "right",
+  "stages": [
+    {
+      "id": "extract",
+      "label": "Extract",
+      "executor": {
+        "name": "extract.py",
+        "type": "program"
+      },
+      "inputs": [
+        {"id": "source", "label": "Source DB", "kind": "data", "required": true}
+      ],
+      "outputs": [
+        {"id": "raw", "label": "Raw Data", "kind": "data"}
+      ]
+    },
+    {
+      "id": "transform",
+      "label": "Transform",
+      "executor": {
+        "name": "transformer",
+        "type": "deterministic"
+      },
+      "inputs": [
+        {"id": "data", "label": "Raw Data", "kind": "data"},
+        {"id": "schema", "label": "Schema", "kind": "config"}
+      ],
+      "outputs": [
+        {"id": "clean", "label": "Clean Data", "kind": "data"}
+      ]
+    },
+    {
+      "id": "load",
+      "label": "Load",
+      "executor": {
+        "name": "Warehouse API",
+        "type": "api",
+        "endpoint": "https://warehouse.example.com"
+      },
+      "inputs": [
+        {"id": "data", "label": "Clean Data", "kind": "data"}
+      ],
+      "outputs": [
+        {"id": "result", "label": "Load Result", "kind": "artifact"}
+      ]
+    }
+  ]
+}

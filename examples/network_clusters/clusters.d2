@@ -1,0 +1,35 @@
+grid-columns: 2
+
+cluster1: Cluster 1 {
+  direction: down
+
+  services: "" {
+    direction: right
+    style.stroke-width: 0
+
+    service1a: Service 1A
+    service1b: Service 1B
+  }
+
+  datastore1: DataStore 1 {
+    shape: cylinder
+  }
+
+  services.service1a -> datastore1
+  services.service1b -> datastore1
+}
+
+cluster2: Cluster 2 {
+  direction: down
+
+  service2: Service 2
+
+  datastore2: DataStore 2 {
+    shape: cylinder
+  }
+
+  service2 -> datastore2
+}
+
+# Cross-cluster replication
+cluster2.datastore2 -> cluster1.datastore1: replication

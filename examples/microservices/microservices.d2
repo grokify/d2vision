@@ -1,0 +1,50 @@
+direction: right
+
+gateway: API Gateway {
+  direction: down
+
+  auth: Auth
+  rate_limit: Rate Limiter
+  router: Router
+
+  auth -> rate_limit
+  rate_limit -> router
+}
+
+services: Services {
+  direction: down
+  grid-columns: 2
+
+  user_svc: User Service
+  order_svc: Order Service
+  product_svc: Product Service
+  payment_svc: Payment Service
+}
+
+data: Data Layer {
+  direction: down
+
+  cache: Redis Cache {
+    shape: cylinder
+  }
+  db: PostgreSQL {
+    shape: cylinder
+  }
+  queue: Message Queue {
+    shape: queue
+  }
+}
+
+client: Client {
+  shape: person
+}
+client -> "gateway.auth"
+"gateway.router" -> "services.user_svc"
+"gateway.router" -> "services.order_svc"
+"gateway.router" -> "services.product_svc"
+"gateway.router" -> "services.payment_svc"
+"services.user_svc" -> "data.db"
+"services.order_svc" -> "data.db"
+"services.order_svc" -> "data.queue"
+"services.product_svc" -> "data.cache"
+"services.payment_svc" -> "data.queue"

@@ -1,0 +1,57 @@
+{
+  "id": "expense-approval",
+  "label": "Expense Approval",
+  "direction": "right",
+  "stages": [
+    {
+      "id": "submit",
+      "label": "Submit Expense",
+      "executor": {
+        "name": "expense-api",
+        "type": "api"
+      },
+      "inputs": [
+        {"id": "expense", "label": "Expense Report", "kind": "data", "required": true}
+      ]
+    },
+    {
+      "id": "check_amount",
+      "label": "Over Limit?",
+      "executor": {
+        "name": "policy-check",
+        "type": "deterministic"
+      },
+      "branches": [
+        {"label": "Yes", "nextStage": "manager_review"},
+        {"label": "No", "nextStage": "auto_approve"}
+      ]
+    },
+    {
+      "id": "manager_review",
+      "label": "Manager Review",
+      "executor": {
+        "name": "approval-agent",
+        "type": "agent"
+      }
+    },
+    {
+      "id": "auto_approve",
+      "label": "Auto Approve",
+      "executor": {
+        "name": "auto-approver",
+        "type": "deterministic"
+      }
+    },
+    {
+      "id": "reimburse",
+      "label": "Process Reimbursement",
+      "executor": {
+        "name": "payroll-api",
+        "type": "api"
+      },
+      "outputs": [
+        {"id": "payment", "label": "Payment", "kind": "artifact"}
+      ]
+    }
+  ]
+}

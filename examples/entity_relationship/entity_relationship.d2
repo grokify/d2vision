@@ -1,0 +1,43 @@
+direction: right
+
+"orders.user_id" -> "users.id"
+"order_items.order_id" -> "orders.id"
+"order_items.product_id" -> "products.id"
+users {
+  shape: sql_table
+
+  id: uuid { constraint: PK }
+  email: varchar(255) { constraint: [UNQ, NOT NULL] }
+  name: varchar(100)
+  created_at: timestamp
+  updated_at: timestamp
+}
+
+orders {
+  shape: sql_table
+
+  id: uuid { constraint: PK }
+  user_id: uuid { constraint: FK }
+  status: varchar(20)
+  total: decimal(10,2)
+  created_at: timestamp
+}
+
+products {
+  shape: sql_table
+
+  id: uuid { constraint: PK }
+  name: varchar(255) { constraint: NOT NULL }
+  price: decimal(10,2)
+  stock: int
+}
+
+order_items {
+  shape: sql_table
+
+  id: uuid { constraint: PK }
+  order_id: uuid { constraint: FK }
+  product_id: uuid { constraint: FK }
+  quantity: int
+  price: decimal(10,2)
+}

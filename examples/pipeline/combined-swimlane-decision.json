@@ -1,0 +1,56 @@
+{
+  "id": "order-with-stock-check",
+  "label": "Order with Inventory Check",
+  "direction": "right",
+  "stages": [
+    {
+      "id": "receive",
+      "label": "Receive Order",
+      "lane": "Sales",
+      "executor": {
+        "name": "order-api",
+        "type": "api"
+      }
+    },
+    {
+      "id": "check_stock",
+      "label": "In Stock?",
+      "lane": "Warehouse",
+      "executor": {
+        "name": "inventory-api",
+        "type": "api"
+      },
+      "branches": [
+        {"label": "Yes", "nextStage": "ship"},
+        {"label": "No", "nextStage": "backorder"}
+      ]
+    },
+    {
+      "id": "ship",
+      "label": "Ship Order",
+      "lane": "Warehouse",
+      "executor": {
+        "name": "shipping-api",
+        "type": "api"
+      }
+    },
+    {
+      "id": "backorder",
+      "label": "Create Backorder",
+      "lane": "Warehouse",
+      "executor": {
+        "name": "backorder-api",
+        "type": "api"
+      }
+    },
+    {
+      "id": "notify",
+      "label": "Notify Customer",
+      "lane": "Sales",
+      "executor": {
+        "name": "notification-api",
+        "type": "api"
+      }
+    }
+  ]
+}

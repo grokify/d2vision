@@ -1,0 +1,77 @@
+direction: right
+
+sources: Data Sources {
+  direction: down
+
+  api: REST API
+  db: Database {
+    shape: cylinder
+  }
+  files: File System {
+    shape: page
+  }
+  stream: Event Stream {
+    shape: queue
+  }
+}
+
+ingestion: Ingestion {
+  direction: down
+
+  collector: Data Collector
+  validator: Validator
+  buffer: Buffer {
+    shape: queue
+  }
+
+  collector -> validator
+  validator -> buffer
+}
+
+processing: Processing {
+  direction: down
+
+  transform: Transform
+  enrich: Enrich
+  aggregate: Aggregate
+
+  transform -> enrich
+  enrich -> aggregate
+}
+
+storage: Storage {
+  direction: down
+
+  lake: Data Lake {
+    shape: cylinder
+  }
+  warehouse: Data Warehouse {
+    shape: cylinder
+  }
+  mart: Data Mart {
+    shape: cylinder
+  }
+
+  lake -> warehouse
+  warehouse -> mart
+}
+
+consumption: Consumption {
+  direction: down
+
+  bi: BI Dashboard
+  reports: Reports {
+    shape: page
+  }
+  ml: ML Models
+}
+
+"sources.api" -> "ingestion.collector"
+"sources.db" -> "ingestion.collector"
+"sources.files" -> "ingestion.collector"
+"sources.stream" -> "ingestion.collector"
+"ingestion.buffer" -> "processing.transform"
+"processing.aggregate" -> "storage.lake"
+"storage.mart" -> "consumption.bi"
+"storage.mart" -> "consumption.reports"
+"storage.warehouse" -> "consumption.ml"

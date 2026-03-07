@@ -1,0 +1,23 @@
+auth_flow: Authentication Flow {
+  shape: sequence_diagram
+
+  user: User { shape: person }
+  client: Client App
+  gateway: API Gateway
+  auth: Auth Service
+  db: User DB
+
+  user -> client: Enter credentials
+  client -> gateway: POST /login
+  gateway -> auth: Validate token
+  auth -> db: Query user
+  db -> auth: User data
+  auth -> gateway: JWT token
+  gateway -> client: 200 OK + token
+  client -> user: Login success
+
+  error_case: Invalid Credentials {
+    auth -> gateway: 401 Unauthorized
+    gateway -> client: 401 Error
+  }
+}

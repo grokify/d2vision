@@ -1,0 +1,81 @@
+grid-columns: 3
+
+users: Users {
+  direction: down
+
+  web: Web Users {
+    shape: person
+  }
+  mobile: Mobile Users {
+    shape: person
+  }
+}
+
+edge: Edge Layer {
+  direction: down
+
+  cdn: CDN {
+    shape: cloud
+  }
+  waf: WAF
+  lb: Load Balancer
+
+  cdn -> waf
+  waf -> lb
+}
+
+compute: Compute Layer {
+  direction: down
+
+  api: API Servers
+  workers: Worker Nodes
+  scheduler: Job Scheduler
+
+  api -> workers
+  scheduler -> workers
+}
+
+data: Data Layer {
+  direction: right
+
+  primary: Primary DB {
+    shape: cylinder
+  }
+  replica: Read Replica {
+    shape: cylinder
+  }
+  cache: Cache {
+    shape: cylinder
+  }
+
+  primary -> replica: replication
+}
+
+storage: Storage Layer {
+  direction: down
+
+  s3: Object Storage {
+    shape: cylinder
+  }
+  logs: Log Storage {
+    shape: cylinder
+  }
+}
+
+monitoring: Observability {
+  direction: down
+
+  metrics: Metrics
+  traces: Traces
+  alerts: Alerting
+}
+
+"users.web" -> "edge.cdn"
+"users.mobile" -> "edge.cdn"
+"edge.lb" -> "compute.api"
+"compute.api" -> "data.cache"
+"compute.api" -> "data.primary"
+"compute.workers" -> "data.primary"
+"compute.api" -> "storage.s3"
+"compute.api" -> "monitoring.metrics"
+"compute.workers" -> "monitoring.traces"
