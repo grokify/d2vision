@@ -67,6 +67,9 @@ nav:
       - Pipeline Use Cases: cookbook/pipeline-use-cases.md
   - Examples:
       - Overview: examples/index.md
+  - Releases:
+      - Overview: releases/index.md
+      - v0.1.0: releases/v0.1.0.md
   - API Reference: api-reference.md
   - Troubleshooting: troubleshooting.md
 

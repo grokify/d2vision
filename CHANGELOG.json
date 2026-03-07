@@ -1,0 +1,68 @@
+{
+  "irVersion": "1.0",
+  "project": "d2vision",
+  "repository": "https://github.com/grokify/d2vision",
+  "versioning": "semver",
+  "commitConvention": "conventional",
+  "maintainers": ["grokify", "johncwang@gmail.com"],
+  "releases": [
+    {
+      "version": "v0.1.0",
+      "date": "2026-03-07",
+      "highlights": [
+        { "description": "Complete toolkit for D2 diagram parsing, generation, and AI-assisted creation" },
+        { "description": "TOON output format (default) uses ~40% fewer tokens than JSON - ideal for LLM consumption" },
+        { "description": "Embedded D2 rendering engine - no separate D2 CLI installation required" },
+        { "description": "Mermaid and PlantUML conversion support" }
+      ],
+      "added": [
+        { "description": "Core diagram types: `Diagram`, `Node`, `Edge`, `Bounds` with full styling support", "commit": "dd13c67" },
+        { "description": "SVG parser that decodes D2's base64-encoded element IDs from CSS class names", "commit": "dd13c67" },
+        { "description": "Shape type constants: rectangle, circle, cylinder, diamond, hexagon, and more", "commit": "dd13c67" },
+        { "description": "Geometry utilities for points and bounds operations", "commit": "dd13c67" },
+        { "description": "NLP descriptions: `Describe()`, `DescribeSummary()`, `DescribeDetailed()`, `DescribeForLLM()`", "commit": "bfb71a8" },
+        { "description": "Layout analysis detecting patterns (flow, hierarchical, grid) with generation hints", "commit": "bfb71a8" },
+        { "description": "`format` package with TOON (default), JSON, JSON-compact, and YAML output formats", "commit": "29016d7" },
+        { "description": "`DiagramSpec` for generating D2 code from structured specifications", "commit": "e90be48" },
+        { "description": "`PipelineSpec` for workflow diagrams with stages, executors, swimlanes, and decision branches", "commit": "e90be48" },
+        { "description": "Pipeline rendering modes: detailed, simple, swimlane, and decision", "commit": "e90be48" },
+        { "description": "`render` package with embedded D2 rendering engine for SVG/PNG/PDF output", "commit": "e4db685" },
+        { "description": "Mermaid converter: flowchart, sequence, and class diagram support", "commit": "49906ec" },
+        { "description": "PlantUML converter: sequence, class, and component diagram support", "commit": "49906ec" },
+        { "description": "Icon library access with 185+ D2 icons across 8 categories", "commit": "2908f2d" },
+        { "description": "Embedded JSON schemas for DiagramSpec, PipelineSpec, and SequenceSpec", "commit": "94cefa0" },
+        { "description": "`parse` command to extract structure from D2-generated SVG", "commit": "b7a5495" },
+        { "description": "`generate` command to create D2 code from specifications", "commit": "b7a5495" },
+        { "description": "`template` command with 7 patterns: network-boundary, microservices, data-flow, sequence, entity-relationship, deployment, pipeline", "commit": "b7a5495" },
+        { "description": "`learn` command to reverse engineer D2 from existing SVG", "commit": "b7a5495" },
+        { "description": "`lint` command to check D2 files for layout issues", "commit": "b7a5495" },
+        { "description": "`diff` command to compare two diagrams", "commit": "b7a5495" },
+        { "description": "`watch` command for auto-rendering D2 files on changes", "commit": "b7a5495" },
+        { "description": "`analyze` command to analyze layout characteristics", "commit": "b7a5495" },
+        { "description": "`convert` command for Mermaid/PlantUML to D2 conversion", "commit": "b7a5495" },
+        { "description": "`pipeline` command to generate workflow diagrams from PipelineSpec", "commit": "b7a5495" },
+        { "description": "`rotate` command to rotate SVG by 90° increments", "commit": "b7a5495" },
+        { "description": "`icons` command to browse/search D2 icon library", "commit": "b7a5495" }
+      ],
+      "documentation": [
+        { "description": "7 example projects: network_clusters, microservices, data_flow, sequence, entity_relationship, deployment, pipeline", "commit": "fb8a10a" },
+        { "description": "MkDocs documentation site with Material theme", "commit": "5127c2d" },
+        { "description": "Command reference for all 12 CLI commands", "commit": "5127c2d" },
+        { "description": "Cookbook with layout fundamentals, container patterns, and styling guides", "commit": "5127c2d" },
+        { "description": "API reference and troubleshooting guide", "commit": "5127c2d" }
+      ],
+      "tests": [
+        { "description": "Unit tests for parser, geometry, ID encoding, NLP, and layout analysis", "commit": "b36b4d9" },
+        { "description": "Test data with sample SVG files for parsing tests", "commit": "b36b4d9" }
+      ],
+      "build": [
+        { "description": "GitHub Actions workflows: go-ci, go-lint, go-sast-codeql, docs, release", "commit": "f001244" },
+        { "description": "GoReleaser configuration for cross-platform binaries", "commit": "f001244" },
+        { "description": "Dependabot configuration for dependency updates", "commit": "f001244" }
+      ],
+      "fixed": [
+        { "description": "Use tagged switch on token type to satisfy staticcheck QF1003", "commit": "6b5f7f6" }
+      ]
+    }
+  ]
+}
