@@ -91,21 +91,5 @@ release:
   footer: |
     **Full Changelog**: https://github.com/grokify/d2vision/compare/{{ .PreviousTag }}...{{ .Tag }}
 
-brews:
-  - name: d2vision
-    repository:
-      owner: grokify
-      name: homebrew-tap
-    commit_author:
-      name: goreleaserbot
-      email: bot@goreleaser.com
-    directory: Formula
-    homepage: https://github.com/grokify/d2vision
-    description: Tools for D2 diagram parsing, generation, and AI-assisted creation
-    license: MIT
-    test: |
-      system "#{bin}/d2vision", "--version"
-    skip_upload: auto
-
 announce:
   skip: true
