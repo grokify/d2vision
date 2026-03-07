@@ -1,0 +1,111 @@
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+version: 2
+
+project_name: d2vision
+
+before:
+  hooks:
+    - go mod tidy
+    - go generate ./...
+
+builds:
+  - id: d2vision
+    main: ./cmd/d2vision
+    binary: d2vision
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X github.com/grokify/d2vision.Version={{.Version}}
+    mod_timestamp: '{{ .CommitTimestamp }}'
+
+archives:
+  - id: default
+    formats:
+      - tar.gz
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- .Version }}_
+      {{- .Os }}_
+      {{- .Arch }}
+    format_overrides:
+      - goos: windows
+        formats:
+          - zip
+    files:
+      - README.md
+      - LICENSE
+
+checksum:
+  name_template: 'checksums.txt'
+  algorithm: sha256
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  sort: asc
+  use: github
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^chore:'
+      - '^ci:'
+      - Merge pull request
+      - Merge branch
+  groups:
+    - title: Features
+      regexp: '^feat'
+      order: 0
+    - title: Bug Fixes
+      regexp: '^fix'
+      order: 1
+    - title: Performance
+      regexp: '^perf'
+      order: 2
+    - title: Refactoring
+      regexp: '^refactor'
+      order: 3
+    - title: Other
+      order: 999
+
+release:
+  github:
+    owner: grokify
+    name: d2vision
+  draft: false
+  prerelease: auto
+  mode: replace
+  header: |
+    ## d2vision {{ .Tag }}
+
+    Tools for D2 diagram parsing, generation, and AI-assisted creation.
+  footer: |
+    **Full Changelog**: https://github.com/grokify/d2vision/compare/{{ .PreviousTag }}...{{ .Tag }}
+
+brews:
+  - name: d2vision
+    repository:
+      owner: grokify
+      name: homebrew-tap
+    commit_author:
+      name: goreleaserbot
+      email: bot@goreleaser.com
+    directory: Formula
+    homepage: https://github.com/grokify/d2vision
+    description: Tools for D2 diagram parsing, generation, and AI-assisted creation
+    license: MIT
+    test: |
+      system "#{bin}/d2vision", "--version"
+    skip_upload: auto
+
+announce:
+  skip: true
