@@ -1,0 +1,76 @@
+site_name: d2vision
+site_description: Tools for D2 diagram parsing, generation, and AI-assisted creation
+site_url: https://grokify.github.io/d2vision
+repo_url: https://github.com/grokify/d2vision
+repo_name: grokify/d2vision
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.highlight
+    - content.code.copy
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - admonition
+  - pymdownx.details
+  - tables
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - Commands:
+      - Overview: commands/index.md
+      - parse: commands/parse.md
+      - generate: commands/generate.md
+      - template: commands/template.md
+      - pipeline: commands/pipeline.md
+      - convert: commands/convert.md
+      - learn: commands/learn.md
+      - lint: commands/lint.md
+      - diff: commands/diff.md
+      - watch: commands/watch.md
+      - analyze: commands/analyze.md
+      - icons: commands/icons.md
+      - rotate: commands/rotate.md
+  - Cookbook:
+      - Overview: cookbook/index.md
+      - Layout Fundamentals: cookbook/layout-fundamentals.md
+      - Side-by-Side Layouts: cookbook/side-by-side.md
+      - Container Patterns: cookbook/containers.md
+      - Cross-Container Edges: cookbook/cross-container-edges.md
+      - Sequence Diagrams: cookbook/sequence-diagrams.md
+      - SQL Tables: cookbook/sql-tables.md
+      - Styling: cookbook/styling.md
+      - Pipeline Use Cases: cookbook/pipeline-use-cases.md
+  - Examples:
+      - Overview: examples/index.md
+  - API Reference: api-reference.md
+  - Troubleshooting: troubleshooting.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/grokify/d2vision
