@@ -764,7 +764,8 @@ func (p *Parser) parsePackage(pkgType string) (*Package, error) {
 			}
 
 			tok := p.current()
-			if tok.Type == TokenIdent {
+			switch tok.Type {
+			case TokenIdent:
 				lower := strings.ToLower(tok.Value)
 				switch lower {
 				case "class", "interface", "abstract":
@@ -785,12 +786,12 @@ func (p *Parser) parsePackage(pkgType string) (*Package, error) {
 				default:
 					p.skipToNextLine()
 				}
-			} else if tok.Type == TokenBracketOpen {
+			case TokenBracketOpen:
 				comp, err := p.parseComponentBracket()
 				if err == nil {
 					pkg.Components = append(pkg.Components, comp)
 				}
-			} else {
+			default:
 				p.skipToNextLine()
 			}
 		}

@@ -202,7 +202,8 @@ func (p *Parser) parseSubgraph() (*Subgraph, error) {
 	// Formats: subgraph id, subgraph id[label], subgraph "label"
 	tok := p.current()
 
-	if tok.Type == TokenIdent {
+	switch tok.Type {
+	case TokenIdent:
 		sg.ID = tok.Value
 		sg.Label = tok.Value
 		p.advance()
@@ -212,7 +213,7 @@ func (p *Parser) parseSubgraph() (*Subgraph, error) {
 			sg.Label = p.current().Value
 			p.advance()
 		}
-	} else if tok.Type == TokenString {
+	case TokenString:
 		sg.Label = tok.Value
 		sg.ID = sanitizeID(tok.Value)
 		p.advance()
