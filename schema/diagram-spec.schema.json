@@ -1,0 +1,312 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/grokify/d2vision/generate/diagram-spec",
+  "$ref": "#/$defs/DiagramSpec",
+  "$defs": {
+    "ActorSpec": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "shape": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "id"
+      ]
+    },
+    "ColumnSpec": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "constraints": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "name",
+        "type"
+      ]
+    },
+    "ContainerSpec": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "direction": {
+          "type": "string"
+        },
+        "gridColumns": {
+          "type": "integer"
+        },
+        "gridRows": {
+          "type": "integer"
+        },
+        "style": {
+          "$ref": "#/$defs/StyleSpec"
+        },
+        "nodes": {
+          "items": {
+            "$ref": "#/$defs/NodeSpec"
+          },
+          "type": "array"
+        },
+        "containers": {
+          "items": {
+            "$ref": "#/$defs/ContainerSpec"
+          },
+          "type": "array"
+        },
+        "edges": {
+          "items": {
+            "$ref": "#/$defs/EdgeSpec"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "id"
+      ]
+    },
+    "DiagramSpec": {
+      "properties": {
+        "direction": {
+          "type": "string"
+        },
+        "gridColumns": {
+          "type": "integer"
+        },
+        "gridRows": {
+          "type": "integer"
+        },
+        "nodes": {
+          "items": {
+            "$ref": "#/$defs/NodeSpec"
+          },
+          "type": "array"
+        },
+        "containers": {
+          "items": {
+            "$ref": "#/$defs/ContainerSpec"
+          },
+          "type": "array"
+        },
+        "edges": {
+          "items": {
+            "$ref": "#/$defs/EdgeSpec"
+          },
+          "type": "array"
+        },
+        "sequences": {
+          "items": {
+            "$ref": "#/$defs/SequenceSpec"
+          },
+          "type": "array"
+        },
+        "tables": {
+          "items": {
+            "$ref": "#/$defs/TableSpec"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "EdgeSpec": {
+      "properties": {
+        "from": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "sourceArrow": {
+          "type": "string"
+        },
+        "targetArrow": {
+          "type": "string"
+        },
+        "style": {
+          "$ref": "#/$defs/StyleSpec"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "from",
+        "to"
+      ]
+    },
+    "GroupSpec": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "messages": {
+          "items": {
+            "$ref": "#/$defs/MessageSpec"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "id",
+        "messages"
+      ]
+    },
+    "MessageSpec": {
+      "properties": {
+        "from": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "from",
+        "to"
+      ]
+    },
+    "NodeSpec": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "shape": {
+          "type": "string"
+        },
+        "icon": {
+          "type": "string"
+        },
+        "style": {
+          "$ref": "#/$defs/StyleSpec"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "id"
+      ]
+    },
+    "SequenceSpec": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "actors": {
+          "items": {
+            "$ref": "#/$defs/ActorSpec"
+          },
+          "type": "array"
+        },
+        "steps": {
+          "items": {
+            "$ref": "#/$defs/MessageSpec"
+          },
+          "type": "array"
+        },
+        "groups": {
+          "items": {
+            "$ref": "#/$defs/GroupSpec"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "id",
+        "steps"
+      ]
+    },
+    "StyleSpec": {
+      "properties": {
+        "fill": {
+          "type": "string"
+        },
+        "stroke": {
+          "type": "string"
+        },
+        "strokeWidth": {
+          "type": "integer"
+        },
+        "borderRadius": {
+          "type": "integer"
+        },
+        "fontSize": {
+          "type": "integer"
+        },
+        "opacity": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "TableSpec": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "columns": {
+          "items": {
+            "$ref": "#/$defs/ColumnSpec"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "id",
+        "columns"
+      ]
+    }
+  },
+  "title": "DiagramSpec",
+  "description": "Defines the structure for generating D2 diagrams with nodes, containers, edges, and special diagram types."
+}

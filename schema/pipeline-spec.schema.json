@@ -1,0 +1,192 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/grokify/d2vision/generate/pipeline-spec",
+  "$ref": "#/$defs/PipelineSpec",
+  "$defs": {
+    "BranchSpec": {
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "nextStage": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "label",
+        "nextStage"
+      ]
+    },
+    "ExecutorSpec": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "endpoint": {
+          "type": "string"
+        },
+        "command": {
+          "type": "string"
+        },
+        "model": {
+          "type": "string"
+        },
+        "prompt": {
+          "type": "string"
+        },
+        "agent": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "name",
+        "type"
+      ]
+    },
+    "FlowSpec": {
+      "properties": {
+        "from": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "transform": {
+          "type": "string"
+        },
+        "async": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "from",
+        "to"
+      ]
+    },
+    "PipelineSpec": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "direction": {
+          "type": "string"
+        },
+        "stages": {
+          "items": {
+            "$ref": "#/$defs/StageSpec"
+          },
+          "type": "array"
+        },
+        "flows": {
+          "items": {
+            "$ref": "#/$defs/FlowSpec"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "id",
+        "stages"
+      ]
+    },
+    "ResourceSpec": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "schema": {
+          "type": "string"
+        },
+        "required": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "id",
+        "kind"
+      ]
+    },
+    "StageSpec": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "executor": {
+          "$ref": "#/$defs/ExecutorSpec"
+        },
+        "inputs": {
+          "items": {
+            "$ref": "#/$defs/ResourceSpec"
+          },
+          "type": "array"
+        },
+        "outputs": {
+          "items": {
+            "$ref": "#/$defs/ResourceSpec"
+          },
+          "type": "array"
+        },
+        "parallel": {
+          "items": {
+            "$ref": "#/$defs/StageSpec"
+          },
+          "type": "array"
+        },
+        "joinFrom": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "lane": {
+          "type": "string"
+        },
+        "branches": {
+          "items": {
+            "$ref": "#/$defs/BranchSpec"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "id",
+        "executor"
+      ]
+    }
+  },
+  "title": "PipelineSpec",
+  "description": "Defines a multi-stage process pipeline with inputs, outputs, and various executor types including deterministic code and LLM/agents."
+}
