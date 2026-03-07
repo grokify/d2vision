@@ -9,18 +9,18 @@ Tools for [D2](https://d2lang.com) diagram parsing, generation, and AI-assisted 
 
 d2vision provides a complete toolkit for working with D2 diagrams:
 
-- **Parse**: Extract structure from D2-generated SVGs
-- **Generate**: Create D2 code from structured specifications
-- **Template**: Quick-start patterns for common diagrams
-- **Learn**: Reverse engineer D2 code from existing SVGs
-- **Lint**: Check D2 files for common layout issues
-- **Diff**: Compare two diagrams
-- **Watch**: Auto-render D2 files on changes
-- **Analyze**: Analyze layout and provide generation hints
-- **Icons**: Browse and search D2's icon library
-- **Pipeline**: Generate workflow diagrams from PipelineSpec
-- **Convert**: Convert Mermaid/PlantUML diagrams to D2
-- **Rotate**: Rotate SVG by 90° increments (landscape ↔ portrait)
+- 🔍 **Parse**: Extract structure from D2-generated SVGs
+- ⚙️ **Generate**: Create D2 code from structured specifications
+- 📋 **Template**: Quick-start patterns for common diagrams
+- 🎓 **Learn**: Reverse engineer D2 code from existing SVGs
+- ✅ **Lint**: Check D2 files for common layout issues
+- ↔️ **Diff**: Compare two diagrams
+- 👁️ **Watch**: Auto-render D2 files on changes
+- 📊 **Analyze**: Analyze layout and provide generation hints
+- 🎨 **Icons**: Browse and search D2's icon library
+- 🔄 **Pipeline**: Generate workflow diagrams from PipelineSpec
+- 🔀 **Convert**: Convert Mermaid/PlantUML diagrams to D2
+- 🔃 **Rotate**: Rotate SVG by 90° increments (landscape ↔ portrait)
 
 Default output format is **TOON** (Token-Oriented Object Notation), which uses ~40% fewer tokens than JSON - ideal for LLM consumption.
 
