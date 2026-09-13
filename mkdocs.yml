@@ -53,6 +53,8 @@ nav:
       - diff: commands/diff.md
       - watch: commands/watch.md
       - analyze: commands/analyze.md
+      - review: commands/review.md
+      - compact: commands/compact.md
       - icons: commands/icons.md
       - rotate: commands/rotate.md
   - Cookbook:
@@ -70,6 +72,7 @@ nav:
       - Overview: examples/index.md
   - Releases:
       - Overview: releases/index.md
+      - v0.2.0: releases/v0.2.0.md
       - v0.1.0: releases/v0.1.0.md
   - Lint Rules: lint-rules.md
   - API Reference: api-reference.md

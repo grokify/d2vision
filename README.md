@@ -217,7 +217,7 @@ d2vision generate spec.toon | d2 - new_diagram.svg
 
 ### Lint
 
-Check D2 files for common layout issues before rendering.
+Deterministic, static checks over a D2 file; exits non-zero on findings (CI-ready).
 
 ```bash
 # Lint a D2 file
@@ -225,14 +225,37 @@ d2vision lint diagram.d2
 
 # JSON output for CI integration
 d2vision lint diagram.d2 --format json
+
+# List all rules, or explain one
+d2vision lint --list
+d2vision lint --explain corner-near
 ```
 
-Checks for:
+Rules include `corner-near` (corner-pinned elements → wasted whitespace),
+`text-overlap` (overlapping labels; opt-in, post-layout), cross-container edges,
+missing `grid-columns`, inconsistent directions, deep nesting, and duplicate
+nodes. A `.d2vision.yaml` config enables/disables rules, overrides severities,
+and sets per-rule options, so one invocation runs the whole policy. See
+[docs/lint-rules.md](docs/lint-rules.md).
 
-- Cross-container edges that may cause vertical stacking
-- Missing `grid-columns` for side-by-side layouts
-- Inconsistent direction settings
-- Deeply nested containers (performance warning)
+### Review
+
+Comprehensive diagram quality review across layout, whitespace, legend, and
+hierarchy — for a D2 source file or a rendered SVG.
+
+```bash
+d2vision review diagram.svg
+d2vision review diagram.d2 --format json
+```
+
+### Compact
+
+Render a diagram with long node labels replaced by short numeric keys, plus a
+legend mapping keys back to labels — for dense diagrams.
+
+```bash
+d2vision compact diagram.d2 -o diagram.svg --legend legend.json
+```
 
 ### Diff
 

@@ -13,6 +13,9 @@ d2vision lint <file.d2> [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-f, --format` | `text` | Output format: text, toon, json |
+| `--config` | *(auto)* | Path to a lint config (YAML); defaults to the nearest `.d2vision.yaml` |
+| `--list` | `false` | List every lint rule (code, severity, title) and exit |
+| `--explain <code>` | | Print the full remediation guidance for a rule code and exit |
 
 ## Exit Codes
 
@@ -21,7 +24,58 @@ d2vision lint <file.d2> [flags]
 | 0 | No issues found |
 | 1 | Issues found or error occurred |
 
+## Configuration
+
+A single YAML config (`.d2vision.yaml`) declares which rules run and how, so one
+invocation applies a whole policy — in the spirit of golangci-lint. It is
+resolved as `--config <path>`, else the nearest `.d2vision.yaml` walking up from
+the target file, else the built-in defaults.
+
+```yaml
+rules:
+  text-overlap:          # opt-in: runs a full layout pass
+    enabled: true
+    settings:
+      layout: elk        # check the engine you actually render with
+  corner-near:
+    severity: warning    # override the default severity
+  deep-nesting:
+    enabled: false       # turn a rule off
+```
+
+Discover rules and their remediation from the CLI:
+
+```bash
+d2vision lint --list                # every rule: code, severity, title
+d2vision lint --explain corner-near # full remediation for one rule
+```
+
+See [Lint Rules](../lint-rules.md) for the full rule reference.
+
 ## Checks Performed
+
+### corner-near (Error)
+
+An element pinned to a corner via `near` (`top-left`/`top-right`/`bottom-left`/
+`bottom-right`) lands diagonally from the diagram body, leaving ~50% whitespace.
+A compiler-based (structural) check.
+
+```d2
+legend: Legend { near: top-left }   # flagged
+```
+
+**Fix**: use an edge-center `near` (`top-center`, `bottom-center`, `center-left`,
+`center-right`) so the element stacks above/below/left/right of the diagram.
+
+### text-overlap (Warning, opt-in)
+
+A connection label's rendered rectangle overlaps another label or an unrelated
+node. This is a **post-layout** check — it runs a full layout pass, so it is
+**engine-dependent** and **opt-in** via config (`rules.text-overlap.enabled:
+true`, `settings.layout: elk|dagre`).
+
+**Fix**: switch layout engine (ELK spaces parallel-edge labels better), reduce
+parallel edges between the same node pair, or shorten/relocate the label.
 
 ### cross-container-edge (Warning)
 
