@@ -1,0 +1,22 @@
+{
+  "name": "d2vision-quality",
+  "version": "1.0.0",
+  "description": "D2 diagram quality analysis agents for layout optimization, whitespace reduction, and legend clarity",
+  "author": "grokify",
+  "license": "MIT",
+  "repository": "https://github.com/grokify/d2vision",
+  "commands": "./commands/",
+  "skills": "./skills/",
+  "agents": "./agents/",
+  "context": "CLAUDE.md",
+  "dependencies": [
+    {
+      "name": "d2vision",
+      "command": "d2vision --version"
+    },
+    {
+      "name": "d2",
+      "command": "d2 --version"
+    }
+  ]
+}
