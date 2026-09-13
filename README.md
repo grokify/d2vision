@@ -525,6 +525,35 @@ The generator converts `DiagramSpec` to D2 code, handling:
 - Edge connections with labels
 - Style properties
 
+## Layout Engines
+
+Layout is a choice between two goals: laying out an *authored, structured*
+diagram (readable and reproducible) versus running a physics simulation over a
+*large, unstructured* graph to reveal clusters. D2 does the former.
+
+**D2 ships Dagre and ELK (open) plus TALA (proprietary plugin).** `d2vision`
+lays out in-process with Dagre (default) and ELK; ELK is what the `text-overlap`
+lint rule uses.
+
+| Engine | In D2? | Family | Best for | Deterministic |
+|--------|--------|--------|----------|---------------|
+| **Dagre** | ✅ bundled | Hierarchical | Most diagrams (flows, trees, chains) | ✅ |
+| **ELK** | ✅ bundled | Hierarchical + orthogonal | Denser graphs, parallel edges, label crowding | ✅ |
+| **TALA** | ⚠️ proprietary plugin | Architecture-tuned | Software-architecture aesthetics | ✅ |
+| **ForceAtlas2** (Gephi) | ❌ | Force-directed | Cluster discovery in big networks | ❌ |
+| **SFDP** (Graphviz) | ❌ | Multi-level force-directed | Large sparse graphs | ❌ |
+| **CoSE-Bilkent** (Cytoscape.js) | ❌ | Compound force-directed | Interactive web graph exploration | ❌ |
+
+The force-directed engines (ForceAtlas2, SFDP, CoSE) answer a different question
+— *what clusters exist in this network?* — for tens of thousands of nodes, and
+are **non-deterministic** (seeded from randomness). They are the wrong fit for
+authored diagrams and for a reproducible build; for genuine large-scale cluster
+discovery, use them as a separate tool (Graphviz `sfdp`, Gephi, Cytoscape), not
+a D2 layout engine. Rule of thumb: **Dagre by default, ELK when a diagram has
+multiple edges between the same nodes.** See
+[Cookbook → Layout Engines](docs/cookbook/layout-engines.md) for the full
+discussion.
+
 ## Supported Features
 
 - Node extraction with shape detection (rectangle, circle, oval, cylinder, diamond, hexagon)
