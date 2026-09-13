@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"math"
 	"os"
 	"regexp"
 	"strconv"
@@ -19,12 +18,12 @@ var (
 
 // ReviewResult contains the comprehensive diagram review.
 type ReviewResult struct {
-	File            string            `json:"file" toon:"File"`
-	Overall         string            `json:"overall" toon:"Overall"`
-	Dimensions      ReviewDimensions  `json:"dimensions" toon:"Dimensions"`
-	Metrics         ReviewMetrics     `json:"metrics" toon:"Metrics"`
-	Issues          []ReviewIssue     `json:"issues" toon:"Issues"`
-	Recommendations []Recommendation  `json:"recommendations" toon:"Recommendations"`
+	File            string           `json:"file" toon:"File"`
+	Overall         string           `json:"overall" toon:"Overall"`
+	Dimensions      ReviewDimensions `json:"dimensions" toon:"Dimensions"`
+	Metrics         ReviewMetrics    `json:"metrics" toon:"Metrics"`
+	Issues          []ReviewIssue    `json:"issues" toon:"Issues"`
+	Recommendations []Recommendation `json:"recommendations" toon:"Recommendations"`
 }
 
 // ReviewDimensions contains status for each review category.
@@ -583,9 +582,10 @@ func outputReviewText(result ReviewResult) error {
 
 	// Overall
 	overallIcon := "✓"
-	if result.Overall == "needs_work" {
+	switch result.Overall {
+	case "needs_work":
 		overallIcon = "✘"
-	} else if result.Overall == "acceptable" {
+	case "acceptable":
 		overallIcon = "⚠"
 	}
 	fmt.Printf("Overall: %s %s\n\n", overallIcon, strings.ToUpper(result.Overall))
@@ -623,9 +623,10 @@ func outputReviewText(result ReviewResult) error {
 
 func printDimension(name string, dim DimensionStatus) {
 	icon := "✓"
-	if dim.Status == "fail" {
+	switch dim.Status {
+	case "fail":
 		icon = "✘"
-	} else if dim.Status == "warning" {
+	case "warning":
 		icon = "⚠"
 	}
 
@@ -696,10 +697,4 @@ func statusEmoji(status string) string {
 	default:
 		return status
 	}
-}
-
-// round rounds a float to n decimal places.
-func round(val float64, precision int) float64 {
-	ratio := math.Pow(10, float64(precision))
-	return math.Round(val*ratio) / ratio
 }
