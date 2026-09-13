@@ -31,6 +31,7 @@ var rootCmd = &cobra.Command{
   Analyze:  Analyze layout and provide generation hints
   Convert:  Convert Mermaid/PlantUML diagrams to D2
   Rotate:   Rotate SVG by 90° increments (for portrait/landscape conversion)
+  Review:   Comprehensive diagram quality review (layout, whitespace, legend)
 
 Output formats:
   - toon (default): Token-Oriented Object Notation (~40% fewer tokens than JSON)
@@ -73,4 +74,6 @@ func init() {
 	rootCmd.AddCommand(convertCmd)
 	rootCmd.AddCommand(pipelineCmd)
 	rootCmd.AddCommand(rotateCmd)
+	rootCmd.AddCommand(reviewCmd)
+	rootCmd.AddCommand(compactCmd)
 }

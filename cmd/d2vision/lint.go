@@ -3,15 +3,20 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 
 	"github.com/grokify/d2vision/format"
+	"github.com/grokify/d2vision/lint"
 	"github.com/spf13/cobra"
 )
 
 var (
-	lintFormat string
+	lintFormat  string
+	lintExplain string
+	lintList    bool
+	lintConfig  string
 )
 
 // LintIssue represents a potential problem in a D2 file.
@@ -35,6 +40,8 @@ var lintCmd = &cobra.Command{
 	Long: `Analyze D2 files and report potential layout problems before rendering.
 
 Checks:
+  - Corner-pinned elements (near: top-left/…) that create a diagonal
+    split-quadrant layout with ~50% whitespace (error)
   - Cross-container edges that may cause alignment issues
   - Missing grid-columns for side-by-side layouts
   - Inconsistent direction settings
@@ -52,15 +59,40 @@ Exit codes:
   0: No issues found
   1: Issues found or error occurred
 `,
-	Args: cobra.ExactArgs(1),
+	Args: cobra.MaximumNArgs(1),
 	RunE: runLint,
 }
 
 func init() {
 	lintCmd.Flags().StringVarP(&lintFormat, "format", "f", "text", "Output format: text, toon, json")
+	lintCmd.Flags().StringVar(&lintExplain, "explain", "", "Print the full remediation guidance for a rule code (e.g. corner-near) and exit")
+	lintCmd.Flags().BoolVar(&lintList, "list", false, "List every lint rule (code, severity, title) and exit")
+	lintCmd.Flags().StringVar(&lintConfig, "config", "", "Path to a lint config (YAML); defaults to the nearest "+lint.ConfigFilename)
+}
+
+// loadLintConfig resolves the config: an explicit --config path, else the
+// nearest .d2vision.yaml walking up from the target file, else the defaults.
+func loadLintConfig(filePath string) (*lint.Config, error) {
+	if lintConfig != "" {
+		return lint.LoadConfig(lintConfig)
+	}
+	if found := lint.FindConfig(filepath.Dir(filePath)); found != "" {
+		return lint.LoadConfig(found)
+	}
+	return lint.DefaultConfig(), nil
 }
 
 func runLint(cmd *cobra.Command, args []string) error {
+	// --list and --explain are registry queries; they don't need a file.
+	if lintList {
+		return runLintList()
+	}
+	if lintExplain != "" {
+		return runLintExplain(lint.Code(lintExplain))
+	}
+	if len(args) == 0 {
+		return fmt.Errorf("a <file.d2> argument is required (or use --list / --explain <code>)")
+	}
 	filePath := args[0]
 
 	content, err := os.ReadFile(filePath)
@@ -68,7 +100,34 @@ func runLint(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("reading %s: %w", filePath, err)
 	}
 
+	cfg, err := loadLintConfig(filePath)
+	if err != nil {
+		return err
+	}
+
 	result := lintD2(filePath, string(content))
+
+	// text-overlap runs a full layout pass, so it is opt-in via config.
+	if cfg.IsEnabled(lint.CodeTextOverlap) {
+		layout := cfg.Setting(lint.CodeTextOverlap, "layout", "dagre")
+		findings, oerr := lint.CheckTextOverlap(string(content), layout)
+		if oerr != nil {
+			result.Issues = append(result.Issues, LintIssue{
+				Line: 1, Severity: lint.SeverityInfo, Code: string(lint.CodeCompileSkipped),
+				Message: fmt.Sprintf("text-overlap check skipped: %v", oerr),
+			})
+		} else {
+			for _, f := range findings {
+				result.Issues = append(result.Issues, LintIssue{
+					Line: f.Line, Severity: f.Severity, Code: string(f.Code),
+					Message: f.Message, Suggestion: f.Suggestion,
+				})
+			}
+		}
+	}
+
+	// Apply config: drop disabled rules and override severities.
+	result.Issues = applyLintConfig(result.Issues, cfg)
 
 	// Output based on format
 	switch lintFormat {
@@ -112,10 +171,84 @@ func runLint(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+// applyLintConfig drops issues whose rule is disabled and overrides the
+// severity of the rest. Codes not in the registry (e.g. compile-skipped meta)
+// pass through unchanged.
+func applyLintConfig(issues []LintIssue, cfg *lint.Config) []LintIssue {
+	out := issues[:0]
+	for _, iss := range issues {
+		code := lint.Code(iss.Code)
+		if _, known := lint.Lookup(code); known {
+			if !cfg.IsEnabled(code) {
+				continue
+			}
+			iss.Severity = cfg.SeverityFor(code)
+		}
+		out = append(out, iss)
+	}
+	return out
+}
+
+// runLintList prints the rule registry (code, severity, title).
+func runLintList() error {
+	if lintFormat != "text" {
+		f, err := format.Parse(lintFormat)
+		if err != nil {
+			return err
+		}
+		out, err := format.Marshal(lint.Rules(), f)
+		if err != nil {
+			return err
+		}
+		fmt.Println(string(out))
+		return nil
+	}
+	fmt.Println("D2 lint rules:")
+	for _, r := range lint.Rules() {
+		fmt.Printf("  %-22s [%s] %s\n", r.Code, r.Severity, r.Title)
+	}
+	fmt.Println("\nRun 'd2vision lint --explain <code>' for remediation guidance.")
+	return nil
+}
+
+// runLintExplain prints the full remediation guidance for a rule code.
+func runLintExplain(code lint.Code) error {
+	rule, ok := lint.Lookup(code)
+	if !ok {
+		return fmt.Errorf("unknown rule code %q (run 'd2vision lint --list')", code)
+	}
+	fmt.Printf("%s  [%s]  %s\n\n", rule.Code, rule.Severity, rule.Title)
+	fmt.Println(rule.Remediation)
+	if rule.DocURL != "" {
+		fmt.Printf("\nDocs: %s\n", rule.DocURL)
+	}
+	return nil
+}
+
 func lintD2(filePath, content string) LintResult {
 	result := LintResult{
 		File:   filePath,
 		Issues: []LintIssue{},
+	}
+
+	// Compiler-based structural checks (deterministic; no regex heuristics).
+	// A compile failure here is not fatal to linting — the text-based checks
+	// below still run — so it is surfaced as an info issue rather than aborting.
+	if findings, err := lint.CheckCornerNear(content); err != nil {
+		result.Issues = append(result.Issues, LintIssue{
+			Line: 1, Severity: "info", Code: string(lint.CodeCompileSkipped),
+			Message: fmt.Sprintf("structural checks skipped (D2 did not compile): %v", err),
+		})
+	} else {
+		for _, f := range findings {
+			result.Issues = append(result.Issues, LintIssue{
+				Line:       f.Line,
+				Severity:   f.Severity,
+				Code:       string(f.Code),
+				Message:    f.Message,
+				Suggestion: f.Suggestion,
+			})
+		}
 	}
 
 	lines := strings.Split(content, "\n")
@@ -201,7 +334,7 @@ func lintD2(filePath, content string) LintResult {
 				result.Issues = append(result.Issues, LintIssue{
 					Line:       lineNum,
 					Severity:   "warning",
-					Code:       "duplicate-node",
+					Code:       string(lint.CodeDuplicateNode),
 					Message:    fmt.Sprintf("Node '%s' was previously defined on line %d", nodeID, existingLine),
 					Suggestion: "Consider consolidating node definitions",
 				})
@@ -224,7 +357,7 @@ func lintD2(filePath, content string) LintResult {
 						result.Issues = append(result.Issues, LintIssue{
 							Line:       lineNum,
 							Severity:   "warning",
-							Code:       "cross-container-edge",
+							Code:       string(lint.CodeCrossContainerEdge),
 							Message:    fmt.Sprintf("Cross-container edge '%s -> %s' may cause vertical stacking", source, target),
 							Suggestion: "Add 'grid-columns: N' at root level to control horizontal layout",
 						})
@@ -239,7 +372,7 @@ func lintD2(filePath, content string) LintResult {
 		result.Issues = append(result.Issues, LintIssue{
 			Line:       maxNestingLine,
 			Severity:   "info",
-			Code:       "deep-nesting",
+			Code:       string(lint.CodeDeepNesting),
 			Message:    fmt.Sprintf("Container nesting depth of %d may impact layout performance", maxNesting),
 			Suggestion: "Consider flattening the structure if possible",
 		})
@@ -256,7 +389,7 @@ func lintD2(filePath, content string) LintResult {
 		result.Issues = append(result.Issues, LintIssue{
 			Line:       1,
 			Severity:   "info",
-			Code:       "missing-grid",
+			Code:       string(lint.CodeMissingGrid),
 			Message:    fmt.Sprintf("Found %d root-level containers without grid-columns", rootContainers),
 			Suggestion: "Add 'grid-columns: N' to control horizontal arrangement",
 		})
@@ -276,7 +409,7 @@ func lintD2(filePath, content string) LintResult {
 		result.Issues = append(result.Issues, LintIssue{
 			Line:       1,
 			Severity:   "info",
-			Code:       "mixed-directions",
+			Code:       string(lint.CodeMixedDirections),
 			Message:    fmt.Sprintf("Mixed direction settings found: %s", strings.Join(parts, ", ")),
 			Suggestion: "Consider using consistent directions for cleaner layout",
 		})
@@ -299,4 +432,3 @@ func getRootContainer(nodeID string) string {
 	}
 	return ""
 }
-

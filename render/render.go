@@ -12,6 +12,7 @@ import (
 
 	"oss.terrastruct.com/d2/d2graph"
 	"oss.terrastruct.com/d2/d2layouts/d2dagrelayout"
+	"oss.terrastruct.com/d2/d2layouts/d2elklayout"
 	"oss.terrastruct.com/d2/d2lib"
 	"oss.terrastruct.com/d2/d2renderers/d2svg"
 	"oss.terrastruct.com/d2/d2target"
@@ -65,16 +66,22 @@ type Options struct {
 
 	// Scale is the output scale factor (default 1.0).
 	Scale float64
+
+	// FontSize applies a global font-size floor (in px) to every shape and
+	// edge label before compiling, so all diagram text renders at least this
+	// large. Elements with an explicit font-size still win. 0 = unchanged.
+	FontSize int64
 }
 
 // DefaultOptions returns default rendering options.
 func DefaultOptions() *Options {
 	return &Options{
-		ThemeID: 0,
-		Pad:     d2svg.DEFAULT_PADDING,
-		Sketch:  false,
-		Center:  false,
-		Scale:   1.0,
+		ThemeID:  0,
+		Pad:      d2svg.DEFAULT_PADDING,
+		Sketch:   false,
+		Center:   false,
+		Scale:    1.0,
+		FontSize: 0,
 	}
 }
 
@@ -100,6 +107,11 @@ func (r *Renderer) Render(ctx context.Context, d2Code string, format Format, opt
 
 	// Add a silent logger to suppress d2's debug output
 	ctx = log.With(ctx, slog.New(slog.NewTextHandler(io.Discard, nil)))
+
+	// Apply a global font-size floor before compiling, if requested.
+	if opts.FontSize > 0 {
+		d2Code = ScaleFontSize(d2Code, opts.FontSize)
+	}
 
 	// Build render options
 	renderOpts := &d2svg.RenderOpts{
@@ -202,21 +214,40 @@ func ThemeID(name string) (int64, error) {
 	return 0, fmt.Errorf("unknown theme: %s", name)
 }
 
-// Compile parses D2 code and returns the compiled diagram (for validation/inspection).
+// Compile parses D2 code and returns the compiled diagram (for
+// validation/inspection), laid out with the default (dagre) engine.
 func Compile(ctx context.Context, d2Code string) (*d2target.Diagram, error) {
+	return CompileWithLayout(ctx, d2Code, "dagre")
+}
+
+// CompileWithLayout compiles and lays out D2 code with the named layout engine
+// ("dagre" or "elk"; "" means dagre) and returns the laid-out diagram, whose
+// shapes and connection labels carry final positions and sizes. It is the entry
+// point for post-layout analysis (e.g. text-overlap detection), where the result
+// is engine-dependent — the same source can overlap under dagre yet be clean
+// under elk.
+func CompileWithLayout(ctx context.Context, d2Code, layout string) (*d2target.Diagram, error) {
 	ruler, err := textmeasure.NewRuler()
 	if err != nil {
 		return nil, fmt.Errorf("creating text ruler: %w", err)
+	}
+
+	var resolver func(engine string) (d2graph.LayoutGraph, error)
+	switch strings.ToLower(strings.TrimSpace(layout)) {
+	case "", "dagre":
+		resolver = func(string) (d2graph.LayoutGraph, error) { return d2dagrelayout.DefaultLayout, nil }
+	case "elk":
+		resolver = func(string) (d2graph.LayoutGraph, error) { return d2elklayout.DefaultLayout, nil }
+	default:
+		return nil, fmt.Errorf("unknown layout %q (want dagre or elk)", layout)
 	}
 
 	// Add a silent logger to suppress d2's debug output
 	ctx = log.With(ctx, slog.New(slog.NewTextHandler(io.Discard, nil)))
 
 	diagram, _, err := d2lib.Compile(ctx, d2Code, &d2lib.CompileOptions{
-		Ruler: ruler,
-		LayoutResolver: func(engine string) (d2graph.LayoutGraph, error) {
-			return d2dagrelayout.DefaultLayout, nil
-		},
+		Ruler:          ruler,
+		LayoutResolver: resolver,
 	}, nil)
 	if err != nil {
 		return nil, fmt.Errorf("compiling D2: %w", err)

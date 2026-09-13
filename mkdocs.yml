@@ -58,6 +58,7 @@ nav:
   - Cookbook:
       - Overview: cookbook/index.md
       - Layout Fundamentals: cookbook/layout-fundamentals.md
+      - Layout Engines: cookbook/layout-engines.md
       - Side-by-Side Layouts: cookbook/side-by-side.md
       - Container Patterns: cookbook/containers.md
       - Cross-Container Edges: cookbook/cross-container-edges.md
@@ -70,6 +71,7 @@ nav:
   - Releases:
       - Overview: releases/index.md
       - v0.1.0: releases/v0.1.0.md
+  - Lint Rules: lint-rules.md
   - API Reference: api-reference.md
   - Troubleshooting: troubleshooting.md
 
