@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
@@ -31,7 +31,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -1970,27 +1970,27 @@
 <h3 id="custom-d2-arguments">Custom D2 Arguments<a class="headerlink" href="#custom-d2-arguments" title="Permanent link">&para;</a></h3>
 <p>Pass additional arguments to the d2 renderer:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Use a specific theme</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>d2vision<span class="w"> </span>watch<span class="w"> </span>diagram.d2<span class="w"> </span>--d2-args<span class="o">=</span><span class="s2">"--theme=200"</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>d2vision<span class="w"> </span>watch<span class="w"> </span>diagram.d2<span class="w"> </span>--d2-args<span class="o">=</span><span class="s2">&quot;--theme=200&quot;</span>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
 <a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="c1"># Use dark theme with specific layout engine</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>d2vision<span class="w"> </span>watch<span class="w"> </span>diagram.d2<span class="w"> </span>--d2-args<span class="o">=</span><span class="s2">"--theme=200 --layout=elk"</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>d2vision<span class="w"> </span>watch<span class="w"> </span>diagram.d2<span class="w"> </span>--d2-args<span class="o">=</span><span class="s2">&quot;--theme=200 --layout=elk&quot;</span>
 <a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>
 <a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="c1"># Multiple arguments</span>
-<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>d2vision<span class="w"> </span>watch<span class="w"> </span>diagram.d2<span class="w"> </span>--d2-args<span class="o">=</span><span class="s2">"--sketch --pad=50"</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>d2vision<span class="w"> </span>watch<span class="w"> </span>diagram.d2<span class="w"> </span>--d2-args<span class="o">=</span><span class="s2">&quot;--sketch --pad=50&quot;</span>
 </code></pre></div>
 <h3 id="post-render-hooks">Post-Render Hooks<a class="headerlink" href="#post-render-hooks" title="Permanent link">&para;</a></h3>
 <p>Run a command after successful renders:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Open the SVG (macOS)</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>d2vision<span class="w"> </span>watch<span class="w"> </span>diagram.d2<span class="w"> </span>--on-success<span class="o">=</span><span class="s2">"open %s"</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>d2vision<span class="w"> </span>watch<span class="w"> </span>diagram.d2<span class="w"> </span>--on-success<span class="o">=</span><span class="s2">&quot;open %s&quot;</span>
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
 <a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="c1"># Refresh browser (requires browser-sync or similar)</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>d2vision<span class="w"> </span>watch<span class="w"> </span>diagram.d2<span class="w"> </span>--on-success<span class="o">=</span><span class="s2">"browser-sync reload"</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>d2vision<span class="w"> </span>watch<span class="w"> </span>diagram.d2<span class="w"> </span>--on-success<span class="o">=</span><span class="s2">&quot;browser-sync reload&quot;</span>
 <a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>
 <a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="c1"># Copy to clipboard (macOS)</span>
-<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>d2vision<span class="w"> </span>watch<span class="w"> </span>diagram.d2<span class="w"> </span>--on-success<span class="o">=</span><span class="s2">"cat %s | pbcopy"</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>d2vision<span class="w"> </span>watch<span class="w"> </span>diagram.d2<span class="w"> </span>--on-success<span class="o">=</span><span class="s2">&quot;cat %s | pbcopy&quot;</span>
 <a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>
 <a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="c1"># Notify on completion</span>
-<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>d2vision<span class="w"> </span>watch<span class="w"> </span>diagram.d2<span class="w"> </span>--on-success<span class="o">=</span><span class="s2">"osascript -e 'display notification \"Diagram updated\"'"</span>
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>d2vision<span class="w"> </span>watch<span class="w"> </span>diagram.d2<span class="w"> </span>--on-success<span class="o">=</span><span class="s2">&quot;osascript -e &#39;display notification \&quot;Diagram updated\&quot;&#39;&quot;</span>
 </code></pre></div>
 <p>The <code>%s</code> placeholder is replaced with the output file path.</p>
 <h3 id="debouncing">Debouncing<a class="headerlink" href="#debouncing" title="Permanent link">&para;</a></h3>
@@ -2011,7 +2011,7 @@
 </code></pre></div>
 <h3 id="live-preview-setup">Live Preview Setup<a class="headerlink" href="#live-preview-setup" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># Watch with browser auto-open (macOS)</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>d2vision<span class="w"> </span>watch<span class="w"> </span>diagram.d2<span class="w"> </span>--on-success<span class="o">=</span><span class="s2">"open %s"</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>d2vision<span class="w"> </span>watch<span class="w"> </span>diagram.d2<span class="w"> </span>--on-success<span class="o">=</span><span class="s2">&quot;open %s&quot;</span>
 <a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
 <a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="c1"># With live reload server</span>
 <a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>npx<span class="w"> </span>live-server<span class="w"> </span>--watch<span class="o">=</span>output.svg<span class="w"> </span><span class="p">&amp;</span>
@@ -2019,7 +2019,7 @@
 </code></pre></div>
 <h3 id="ci-like-local-validation">CI-like Local Validation<a class="headerlink" href="#ci-like-local-validation" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># Lint + render with strict checking</span>
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>d2vision<span class="w"> </span>watch<span class="w"> </span>diagram.d2<span class="w"> </span>--lint<span class="w"> </span>--d2-args<span class="o">=</span><span class="s2">"--bundle=false"</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>d2vision<span class="w"> </span>watch<span class="w"> </span>diagram.d2<span class="w"> </span>--lint<span class="w"> </span>--d2-args<span class="o">=</span><span class="s2">&quot;--bundle=false&quot;</span>
 </code></pre></div>
 <h2 id="error-handling">Error Handling<a class="headerlink" href="#error-handling" title="Permanent link">&para;</a></h2>
 <p>When rendering fails, the watch command continues running:</p>
@@ -2110,7 +2110,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.expand", "navigation.top", "search.highlight", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
     
   </body>
