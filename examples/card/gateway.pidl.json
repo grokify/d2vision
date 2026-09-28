@@ -1,0 +1,20 @@
+{
+  "protocol": {
+    "id": "gateway-request",
+    "name": "Gateway Request",
+    "version": "1.0",
+    "description": "A client calls a service through a gateway that authorizes the request"
+  },
+  "entities": [
+    {"id": "client", "name": "Client", "type": "user"},
+    {"id": "gateway", "name": "Gateway", "type": "server"},
+    {"id": "service", "name": "Service", "type": "server"}
+  ],
+  "flows": [
+    {"from": "client", "to": "gateway", "action": "request", "label": "GET /items", "mode": "request"},
+    {"from": "gateway", "to": "gateway", "action": "authorize", "label": "Check policy", "mode": "request"},
+    {"from": "gateway", "to": "service", "action": "forward", "label": "Forward request", "mode": "request"},
+    {"from": "service", "to": "gateway", "action": "result", "label": "200 OK", "mode": "response"},
+    {"from": "gateway", "to": "client", "action": "respond", "label": "200 OK", "mode": "response"}
+  ]
+}
