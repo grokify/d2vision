@@ -57,6 +57,8 @@ nav:
       - compact: commands/compact.md
       - icons: commands/icons.md
       - rotate: commands/rotate.md
+      - card: commands/card.md
+      - svg2gif: commands/svg2gif.md
   - Cookbook:
       - Overview: cookbook/index.md
       - Layout Fundamentals: cookbook/layout-fundamentals.md
@@ -72,6 +74,7 @@ nav:
       - Overview: examples/index.md
   - Releases:
       - Overview: releases/index.md
+      - v0.3.0: releases/v0.3.0.md
       - v0.2.0: releases/v0.2.0.md
       - v0.1.0: releases/v0.1.0.md
   - Lint Rules: lint-rules.md

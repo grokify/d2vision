@@ -40,6 +40,8 @@ d2vision provides a complete toolkit for working with D2 diagrams:
 - 🔄 **Pipeline**: Generate workflow diagrams from PipelineSpec
 - 🔀 **Convert**: Convert Mermaid/PlantUML diagrams to D2
 - 🔃 **Rotate**: Rotate SVG by 90° increments (landscape ↔ portrait)
+- 🪧 **Card**: Render datasheet-style infographic cards (JSON → SVG / PNG / animated GIF with flow dots), optionally derived from PIDL protocol files
+- 🎞️ **svg2gif**: Convert any animated SVG (SMIL or CSS, including D2 animated edges) to a looping GIF
 
 Default output format is **TOON** (Token-Oriented Object Notation), which uses ~40% fewer tokens than JSON - ideal for LLM consumption.
 
@@ -181,6 +183,22 @@ d2vision convert diagram.puml
 
 # Lint before converting
 d2vision convert --lint-only diagram.mmd
+```
+
+### Card
+
+Render datasheet-style infographic cards from a JSON definition, with animated flow dots on edges. See [docs/commands/card.md](docs/commands/card.md).
+
+```bash
+d2vision card render card.json --svg card.svg --png card.png --scale 2 --gif card.gif
+```
+
+### svg2gif
+
+Convert an animated SVG to a looping GIF. See [docs/commands/svg2gif.md](docs/commands/svg2gif.md).
+
+```bash
+d2vision svg2gif card.svg -o card.gif
 ```
 
 ### Rotate
@@ -478,6 +496,28 @@ func main() {
 }
 ```
 
+### Cards
+
+Render an infographic card, then capture it as PNG or GIF:
+
+```go
+import (
+    "context"
+
+    "github.com/grokify/d2vision/card"
+    "github.com/grokify/d2vision/export"
+)
+
+c, err := card.ParseFile("card.json") // strict parse; PIDL sources resolved and validated
+if err != nil {
+    log.Fatal(err)
+}
+svg, err := c.Render(card.Options{Animate: true}) // deterministic SVG with SMIL flow dots
+
+// PNG and GIF capture use headless Chrome.
+png, err := export.PNG(context.Background(), svg, 1.5, export.Options{Width: c.Width, Height: c.Height, Scale: 2})
+```
+
 ## Diagram Spec Schema
 
 The `DiagramSpec` structure for generating D2 code:
@@ -526,6 +566,7 @@ See the `examples/` directory for complete examples:
 - [`sequence/`](examples/sequence/) - Authentication flow sequence diagram
 - [`entity_relationship/`](examples/entity_relationship/) - Database schema with SQL tables
 - [`deployment/`](examples/deployment/) - Cloud deployment architecture
+- [`card/`](examples/card/) - Datasheet-style infographic cards with animated flow dots
 
 ## How It Works
 

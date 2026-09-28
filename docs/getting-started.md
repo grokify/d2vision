@@ -22,6 +22,8 @@ go install ./cmd/d2vision
 
 d2vision includes the D2 rendering engine as a library, so no separate D2 installation is required.
 
+The `card --png`, `card --gif` and `svg2gif` outputs are captured with headless **Chrome or Chromium**, which must be installed. Everything else, including `card --svg`, needs no browser.
+
 ## Basic Usage
 
 ### Generate a Diagram
@@ -98,6 +100,30 @@ d2vision analyze diagram.svg
 
 # Get comprehensive recreation guide
 d2vision parse diagram.svg --for-generation
+```
+
+### Render an Infographic Card
+
+Cards are datasheet-style posters described in JSON: stacked panels, each with a short text block beside a simple diagram. Edges can carry animated dots that show what is in flight, and numbered badges show the order.
+
+```bash
+# Animated SVG: open it in a browser to watch the dots move
+d2vision card render examples/card/request-flow.card.json --svg card.svg
+
+# PNG at 2x, captured 1.5 s into the animation (needs Chrome)
+d2vision card render examples/card/request-flow.card.json --png card.png --scale 2 --at 1.5
+
+# Looping GIF of one full loop (needs Chrome)
+d2vision card render examples/card/request-flow.card.json --gif card.gif
+```
+
+A panel can also be derived from a [PIDL](https://github.com/grokify/pidl) protocol file, so the diagram cannot drift from the protocol. See [`examples/card/`](https://github.com/grokify/d2vision/tree/main/examples/card) and the [card command guide](commands/card.md).
+
+### Convert an Animated SVG to a GIF
+
+```bash
+# Any animated SVG: SMIL, CSS animations, or D2's `style.animated` edges
+d2vision svg2gif diagram.svg -o diagram.gif
 ```
 
 ## Output Formats

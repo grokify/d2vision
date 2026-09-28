@@ -1,0 +1,31 @@
+{
+  "title": "Gateway request, derived from a protocol file",
+  "height": 330,
+  "artifacts": [
+    {"id": "request", "label": "Request", "color": "#60a5fa"},
+    {"id": "response", "label": "Response", "color": "#34d399"}
+  ],
+  "footer": "d2vision card example",
+  "panels": [
+    {
+      "id": "flow",
+      "height": 280,
+      "title": "Gateway",
+      "body": "This diagram is derived from gateway.pidl.json. Who talks to whom, and in what order, comes from the protocol file, so the picture cannot drift from it.",
+      "source": {
+        "pidl": "gateway.pidl.json",
+        "actors": [
+          {"entity": "client", "icon": "💻", "x": 50, "y": 120},
+          {"entity": "gateway", "icon": "🚪", "x": 190, "y": 120},
+          {"entity": "service", "icon": "⚙️", "x": 340, "y": 120}
+        ],
+        "steps": [
+          {"action": "request", "artifact": "request"},
+          {"action": "forward", "artifact": "request"},
+          {"action": "result", "artifact": "response"},
+          {"action": "respond", "artifact": "response"}
+        ]
+      }
+    }
+  ]
+}

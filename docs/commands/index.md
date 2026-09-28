@@ -18,6 +18,8 @@ d2vision provides commands for working with D2 diagrams.
 | [analyze](analyze.md) | Analyze layout and provide generation hints |
 | [icons](icons.md) | Browse and search D2's icon library |
 | [rotate](rotate.md) | Rotate SVG by 90° increments |
+| [card](card.md) | Render datasheet-style infographic cards (SVG, PNG, animated GIF) |
+| [svg2gif](svg2gif.md) | Convert an animated SVG to a looping GIF |
 
 ## Common Flags
 

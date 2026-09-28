@@ -1,0 +1,64 @@
+{
+  "title": "Request flow through a gateway",
+  "height": 560,
+  "artifacts": [
+    {"id": "request", "label": "Request", "color": "#60a5fa"},
+    {"id": "lookup", "label": "Cache lookup", "color": "#fbbf24"},
+    {"id": "response", "label": "Response", "color": "#34d399"}
+  ],
+  "legend": [
+    {"color": "#60a5fa", "label": "Request"},
+    {"color": "#fbbf24", "label": "Cache lookup"},
+    {"color": "#34d399", "label": "Response"}
+  ],
+  "footer": "d2vision card example",
+  "panels": [
+    {
+      "id": "hero",
+      "height": 150,
+      "ruleBelow": true,
+      "title": "Request Flow",
+      "titleSize": 40,
+      "body": "How a call travels through a gateway",
+      "textSide": "right",
+      "textWidth": 330,
+      "center": true,
+      "diagram": {
+        "nodes": [
+          {"id": "client", "icon": "💻", "label": "Client", "x": 60, "y": 60},
+          {"id": "gateway", "icon": "🚪", "label": "Gateway", "x": 196, "y": 60},
+          {"id": "service", "icon": "⚙️", "label": "Service", "x": 332, "y": 60}
+        ],
+        "edges": [
+          {"from": "client", "to": "gateway", "flow": {"color": "#60a5fa"}},
+          {"from": "gateway", "to": "service", "flow": {"color": "#60a5fa", "delay": 0.6}}
+        ]
+      }
+    },
+    {
+      "id": "steps",
+      "height": 366,
+      "title": "Step by step",
+      "body": "The gateway checks its cache before calling the service. Numbered badges show the order, and the dots show what is in flight.",
+      "diagram": {
+        "nodes": [
+          {"id": "client", "icon": "💻", "label": "Client", "x": 50, "y": 60},
+          {"id": "gateway", "icon": "🚪", "label": "Gateway", "x": 190, "y": 180},
+          {"id": "cache", "icon": "🗃", "label": "Cache", "x": 340, "y": 70},
+          {"id": "service", "icon": "⚙️", "label": "Service", "x": 340, "y": 280}
+        ],
+        "edges": [
+          {"from": "client", "to": "gateway", "flows": [
+            {"color": "#60a5fa", "step": 1},
+            {"mode": "reverse", "color": "#34d399", "step": 5}
+          ]},
+          {"from": "gateway", "to": "cache", "label": "lookup", "flow": {"mode": "alternate", "color": "#fbbf24", "step": 2}},
+          {"from": "gateway", "to": "service", "flows": [
+            {"color": "#60a5fa", "step": 3},
+            {"mode": "reverse", "color": "#34d399", "step": 4}
+          ]}
+        ]
+      }
+    }
+  ]
+}

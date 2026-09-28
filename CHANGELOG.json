@@ -10,6 +10,96 @@
   ],
   "releases": [
     {
+      "version": "v0.3.0",
+      "date": "2026-09-28",
+      "highlights": [
+        {
+          "description": "New `card` command renders datasheet-style infographic cards from JSON to an animated SVG, PNG, or looping GIF"
+        },
+        {
+          "description": "Step-sequenced flows: number the steps and timing, loop length and step badges are derived"
+        },
+        {
+          "description": "Panels derived from PIDL protocol files, so a diagram cannot drift from its protocol"
+        },
+        {
+          "description": "New `svg2gif` command converts any animated SVG (SMIL or CSS, including D2 animated edges) to a looping GIF"
+        }
+      ],
+      "added": [
+        {
+          "description": "`card` package: render datasheet-style infographic cards from a JSON definition to a deterministic SVG with stable ids",
+          "commit": "884193e"
+        },
+        {
+          "description": "Animated flow dots on edges with `forward`, `reverse`, `alternate` and `both` modes, driven by SMIL",
+          "commit": "884193e"
+        },
+        {
+          "description": "Step scheduler: ordered steps with derived timing and loop length, plus numbered step badges on edges",
+          "commit": "884193e"
+        },
+        {
+          "description": "Protocol-backed panels: derive a diagram from a PIDL file, with protocol order and direction checks and warnings for unverified steps",
+          "commit": "884193e"
+        },
+        {
+          "description": "`export` package: headless Chrome capture of an SVG as PNG or animation frames, with an option to launch Chrome with `--no-sandbox`",
+          "commit": "4254cda"
+        },
+        {
+          "description": "`export.EncodeGIF`: shared-palette, no-dither GIF encoder that stores only the changed region of each frame",
+          "commit": "4254cda"
+        },
+        {
+          "description": "`export.InspectSVG`: read pixel size and loop length from an SVG, including SMIL and CSS animation durations",
+          "commit": "4254cda"
+        },
+        {
+          "description": "`card render` command: write SVG, PNG and GIF from one card definition",
+          "commit": "b1d62fe"
+        },
+        {
+          "description": "`svg2gif` command: convert any animated SVG, including D2 animated edges, to a looping GIF",
+          "commit": "b1d62fe"
+        }
+      ],
+      "documentation": [
+        {
+          "description": "Command guides for `card` and `svg2gif`, with getting started, API reference, examples index, troubleshooting and README updated",
+          "commit": "a10049b"
+        },
+        {
+          "description": "Card examples: a hand-drawn card and a card derived from a protocol file",
+          "commit": "06a3038"
+        },
+        {
+          "description": "v0.3.0 release notes",
+          "commit": "8873832"
+        }
+      ],
+      "tests": [
+        {
+          "description": "Unit tests for the card model, layout, flows, timing and PIDL sources, and a test that renders every example card",
+          "commit": "401b563"
+        },
+        {
+          "description": "Tests for GIF encoding and SVG inspection",
+          "commit": "c2b651e"
+        }
+      ],
+      "build": [
+        {
+          "description": "Add `github.com/chromedp/chromedp` v0.16.0 for headless Chrome capture",
+          "commit": "cdebe13"
+        },
+        {
+          "description": "Update dependencies",
+          "commit": "8e1934a"
+        }
+      ]
+    },
+    {
       "version": "v0.2.0",
       "date": "2026-09-12",
       "highlights": [
