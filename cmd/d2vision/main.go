@@ -63,6 +63,8 @@ Examples:
 
 func init() {
 	rootCmd.AddCommand(parseCmd)
+	rootCmd.AddCommand(cardCmd)
+	rootCmd.AddCommand(svg2gifCmd)
 	rootCmd.AddCommand(generateCmd)
 	rootCmd.AddCommand(templateCmd)
 	rootCmd.AddCommand(learnCmd)
