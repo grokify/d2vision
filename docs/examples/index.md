@@ -12,6 +12,7 @@ Complete example diagrams demonstrating d2vision templates and D2 patterns.
 | Sequence | Authentication flow sequence diagram |
 | Entity Relationship | Database schema with SQL tables |
 | Deployment | Cloud deployment architecture |
+| Card | Datasheet-style infographic cards with animated flow dots, hand-drawn or derived from a protocol file |
 
 ## Using Examples
 

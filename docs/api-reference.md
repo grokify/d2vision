@@ -17,6 +17,8 @@ go get github.com/grokify/d2vision
 | `d2vision/generate` | D2 code generation |
 | `d2vision/render` | D2 rendering (SVG output) |
 | `d2vision/convert` | Mermaid/PlantUML conversion |
+| `d2vision/card` | Datasheet-style infographic cards (JSON to animated SVG) |
+| `d2vision/export` | Headless-Chrome capture of SVG to PNG/frames, and GIF encoding |
 
 ## Parsing SVGs
 
@@ -323,6 +325,64 @@ opts := &render.Options{
 
 svg, err := r.RenderSVG(ctx, d2Code, opts)
 ```
+
+## Infographic Cards
+
+The `card` package turns a JSON card definition into an SVG, optionally animated with SMIL flow dots. The `export` package captures that SVG as PNG or frames and encodes GIF.
+
+```go
+import (
+    "context"
+    "os"
+
+    "github.com/grokify/d2vision/card"
+    "github.com/grokify/d2vision/export"
+)
+
+// Parse (strict: unknown fields are errors), resolve any PIDL sources, validate.
+c, err := card.ParseFile("card.json")
+if err != nil {
+    log.Fatal(err)
+}
+for _, w := range c.Warnings() { // steps not backed by a protocol file
+    log.Println("warning:", w)
+}
+
+// Static SVG, or animated with SMIL flow dots.
+svg, err := c.Render(card.Options{Animate: true})
+
+// PNG screenshot 1.5 s into the loop (needs Chrome).
+opt := export.Options{Width: c.Width, Height: c.Height, Scale: 2}
+png, err := export.PNG(context.Background(), svg, 1.5, opt)
+
+// One full loop as a GIF (needs Chrome).
+opt.Scale = 1
+frames, err := export.Frames(context.Background(), svg, c.LoopSeconds(), 25, opt)
+f, _ := os.Create("card.gif")
+err = export.EncodeGIF(f, frames, export.GIFOptions{FPS: 25})
+```
+
+### Card types
+
+| Type | Description |
+|------|-------------|
+| `card.Card` | Whole card: size, `Loop`, `StepGap`, `LoopRest`, `Artifacts`, `Legend`, `Panels` |
+| `card.Panel` | A band: `Diagram`, `Source` (derived from PIDL) or `Table`, plus title/body text |
+| `card.Diagram` | `Nodes` and `Edges` in panel-relative pixels |
+| `card.Edge` | Line between two nodes; `Flows` carry animated dots |
+| `card.Flow` | Dot `Mode` (`forward`, `reverse`, `alternate`, `both`), `Color`, `Speed`, `Count`, `Step` |
+| `card.Source` | Derive a panel's diagram from a PIDL protocol file |
+
+Rendering is deterministic: the same card always produces the same SVG. See the [card command guide](commands/card.md) for the full definition format.
+
+### Export functions
+
+| Function | Description |
+|----------|-------------|
+| `export.PNG(ctx, svg, t, opt)` | PNG screenshot with animation paused at `t` seconds |
+| `export.Frames(ctx, svg, loop, fps, opt)` | One loop of frames, stepping SMIL and CSS animations |
+| `export.EncodeGIF(w, frames, opt)` | Shared-palette GIF that stores only changed regions |
+| `export.InspectSVG(svg)` | Read pixel size and loop length from an SVG |
 
 ## Full Example
 

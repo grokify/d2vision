@@ -57,6 +57,8 @@ nav:
       - compact: commands/compact.md
       - icons: commands/icons.md
       - rotate: commands/rotate.md
+      - card: commands/card.md
+      - svg2gif: commands/svg2gif.md
   - Cookbook:
       - Overview: cookbook/index.md
       - Layout Fundamentals: cookbook/layout-fundamentals.md

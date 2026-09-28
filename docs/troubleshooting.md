@@ -125,6 +125,60 @@ d2vision convert --from plantuml diagram.txt
 
 ---
 
+## Card and GIF Export Issues
+
+### Chrome not found, or "websocket url timeout reached"
+
+**Symptom**: `card --png`, `card --gif` or `svg2gif` fails with `export: load svg in chrome (is Chrome installed?)`, often followed by `websocket url timeout reached`.
+
+**Cause**: These outputs are captured with headless Chrome or Chromium. Either none is installed, or Chrome cannot start because the calling process is itself sandboxed (some CI containers and coding-agent sandboxes). Chrome's own sandbox cannot nest inside another.
+
+**Solution**: Install Chrome or Chromium. If it is installed and still times out, add `--chrome-no-sandbox`:
+
+```bash
+d2vision card render card.json --png card.png --chrome-no-sandbox
+```
+
+`--chrome-no-sandbox` only affects the browser that renders d2vision's own generated SVG. Leave it off on a normal machine.
+
+### Rendering fails with "text needs N px but panel is M px tall"
+
+**Cause**: A panel's title and body do not fit its height. Cards fail instead of clipping text.
+
+**Solution**: Shorten the text or raise the panel `height` (panel heights must still fit the card, minus the footer row when there is a legend or footer).
+
+### Rendering fails with "flow needs Xs starting at Ys but the loop is Zs"
+
+**Cause**: You set an explicit `loop` that is too short for the flows.
+
+**Solution**: Remove `loop` so it is derived from the steps, or raise it. Use `step` numbers on flows instead of hand-tuned `delay` values.
+
+### Rendering fails with "node ... falls outside the diagram area"
+
+**Cause**: Node `x`/`y` are relative to the panel's diagram area (the panel minus its text column), not the whole card.
+
+**Solution**: Check the coordinates against the panel's height and its diagram width (card width minus margins and the text column).
+
+### A step is "not backed by" the protocol file
+
+**Cause**: A `source` step used explicit `from`/`to` instead of a PIDL `action`, so the protocol file does not vouch for it. The step is still drawn; this is a warning, not an error.
+
+**Solution**: Add the message to the PIDL file and reference it by `action`, or accept it as an editorial step.
+
+### The GIF is larger than expected
+
+**Cause**: GIF stores only the changed region of each frame, so size grows with how much of the card moves.
+
+**Solution**: Lower `--fps`, shorten the loop, or reduce how many panels animate at the same time. A card with a few moving dots is typically a few hundred KB.
+
+### Icons look dark or fall back to plain text
+
+**Cause**: Some symbols, such as `⚙`, default to a monochrome text glyph.
+
+**Solution**: Append the emoji variation selector (`U+FE0F`) to force the color emoji, for example `⚙️`. Emoji and fonts come from the machine that renders the PNG/GIF, so output can differ slightly between machines.
+
+---
+
 ## CLI Issues
 
 ### Command not found after installation

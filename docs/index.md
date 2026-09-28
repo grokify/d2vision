@@ -15,6 +15,8 @@ d2vision provides a complete toolkit for working with D2 diagrams:
 - **Watch**: Auto-render D2 files on changes
 - **Analyze**: Analyze layout and provide generation hints
 - **Icons**: Browse and search D2's icon library (185+ SVG icons)
+- **Card**: Render datasheet-style infographic cards with animated flow dots, optionally derived from PIDL protocol files
+- **svg2gif**: Convert any animated SVG (SMIL or CSS, including D2 animated edges) to a looping GIF
 
 ## Why d2vision?
 
@@ -39,6 +41,10 @@ d2vision parse diagram.svg
 
 # Lint a D2 file
 d2vision lint diagram.d2
+
+# Render an animated infographic card, then a GIF of it
+d2vision card render examples/card/request-flow.card.json --svg card.svg
+d2vision svg2gif card.svg -o card.gif
 ```
 
 ## For AI Assistants
