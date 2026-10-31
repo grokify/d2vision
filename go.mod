@@ -7,7 +7,7 @@ require (
 	github.com/chromedp/chromedp v0.21.0
 	github.com/fsnotify/fsnotify v1.10.1
 	github.com/spf13/cobra v1.10.2
-	github.com/toon-format/toon-go v0.0.0-20251202084852-7ca0e27c4e8c
+	github.com/toon-format/toon-go v1.0.1
 	go.yaml.in/yaml/v3 v3.0.5
 	gopkg.in/yaml.v3 v3.0.1
 	oss.terrastruct.com/d2 v0.7.2
