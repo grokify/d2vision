@@ -8,6 +8,13 @@ type DiagramSpec struct {
 	Direction   string `json:"direction,omitempty" yaml:"direction,omitempty"`     // right, down, left, up
 	GridColumns int    `json:"gridColumns,omitempty" yaml:"gridColumns,omitempty"` // Force grid layout
 	GridRows    int    `json:"gridRows,omitempty" yaml:"gridRows,omitempty"`
+	// HorizontalGap and VerticalGap are the space between grid cells, in pixels.
+	HorizontalGap int `json:"horizontalGap,omitempty" yaml:"horizontalGap,omitempty"`
+	VerticalGap   int `json:"verticalGap,omitempty" yaml:"verticalGap,omitempty"`
+
+	// Classes are named styles shared by nodes, containers, and edges that name
+	// them with Class. They are written as D2 classes and as Mermaid classDefs.
+	Classes map[string]StyleSpec `json:"classes,omitempty" yaml:"classes,omitempty"`
 
 	// Top-level elements
 	Nodes      []NodeSpec      `json:"nodes,omitempty" yaml:"nodes,omitempty"`
@@ -28,9 +35,14 @@ type ContainerSpec struct {
 	Direction   string `json:"direction,omitempty" yaml:"direction,omitempty"`
 	GridColumns int    `json:"gridColumns,omitempty" yaml:"gridColumns,omitempty"`
 	GridRows    int    `json:"gridRows,omitempty" yaml:"gridRows,omitempty"`
+	// HorizontalGap and VerticalGap are the space between grid cells, in pixels.
+	HorizontalGap int `json:"horizontalGap,omitempty" yaml:"horizontalGap,omitempty"`
+	VerticalGap   int `json:"verticalGap,omitempty" yaml:"verticalGap,omitempty"`
 
 	// Style
 	Style *StyleSpec `json:"style,omitempty" yaml:"style,omitempty"`
+	// Class names an entry of DiagramSpec.Classes.
+	Class string `json:"class,omitempty" yaml:"class,omitempty"`
 
 	// Children
 	Nodes      []NodeSpec      `json:"nodes,omitempty" yaml:"nodes,omitempty"`
@@ -40,17 +52,23 @@ type ContainerSpec struct {
 
 // NodeSpec defines a single node in the diagram.
 type NodeSpec struct {
-	ID    string `json:"id" yaml:"id"`
-	Label string `json:"label,omitempty" yaml:"label,omitempty"`
-	Shape string `json:"shape,omitempty" yaml:"shape,omitempty"` // rectangle, cylinder, circle, etc.
-	Icon  string     `json:"icon,omitempty" yaml:"icon,omitempty"` // Icon URL or name
+	ID    string     `json:"id" yaml:"id"`
+	Label string     `json:"label,omitempty" yaml:"label,omitempty"`
+	Shape string     `json:"shape,omitempty" yaml:"shape,omitempty"` // rectangle, cylinder, circle, etc.
+	Icon  string     `json:"icon,omitempty" yaml:"icon,omitempty"`   // Icon URL or name
 	Style *StyleSpec `json:"style,omitempty" yaml:"style,omitempty"`
+	// Class names an entry of DiagramSpec.Classes.
+	Class string `json:"class,omitempty" yaml:"class,omitempty"`
 }
 
 // EdgeSpec defines a connection between nodes.
 type EdgeSpec struct {
-	From  string `json:"from" yaml:"from"`   // Source node ID
-	To    string `json:"to" yaml:"to"`       // Target node ID
+	// From and To name nodes. A dot separates the containers on the way to a
+	// node, so "stage.item" is the node item in the container stage. Inside a
+	// container, a name is relative to that container. A node ID that itself
+	// contains a dot cannot be named by an edge.
+	From  string `json:"from" yaml:"from"`
+	To    string `json:"to" yaml:"to"`
 	Label string `json:"label,omitempty" yaml:"label,omitempty"`
 
 	// Arrow style
@@ -58,6 +76,8 @@ type EdgeSpec struct {
 	TargetArrow string `json:"targetArrow,omitempty" yaml:"targetArrow,omitempty"`
 
 	Style *StyleSpec `json:"style,omitempty" yaml:"style,omitempty"`
+	// Class names an entry of DiagramSpec.Classes.
+	Class string `json:"class,omitempty" yaml:"class,omitempty"`
 }
 
 // StyleSpec defines visual styling properties.
@@ -69,7 +89,12 @@ type StyleSpec struct {
 	BorderRadius *int     `json:"borderRadius,omitempty" yaml:"borderRadius,omitempty"`
 	FontSize     *int     `json:"fontSize,omitempty" yaml:"fontSize,omitempty"`
 	Opacity      *float64 `json:"opacity,omitempty" yaml:"opacity,omitempty"`
+	FontColor    string   `json:"fontColor,omitempty" yaml:"fontColor,omitempty"`
+	Bold         *bool    `json:"bold,omitempty" yaml:"bold,omitempty"`
 }
+
+// BoolPtr returns a pointer to a bool value.
+func BoolPtr(b bool) *bool { return &b }
 
 // IntPtr returns a pointer to an int value. Useful for setting StyleSpec fields.
 func IntPtr(i int) *int { return &i }

@@ -360,5 +360,26 @@
         }
       ]
     }
-  ]
+  ],
+  "unreleased": {
+    "added": [
+      {
+        "description": "`generate`: shared `classes` for nodes, containers, and edges, written as D2 classes and Mermaid classDefs"
+      },
+      {
+        "description": "`generate`: `Mermaid` writes a spec as a Mermaid flowchart, with containers as subgraphs"
+      },
+      {
+        "description": "`generate`: style fields `fontColor` and `bold`"
+      }
+    ],
+    "fixed": [
+      {
+        "description": "`generate`: labels with characters D2 reads as syntax (`:`, `;`, `{`, `}`, `#`, `$`, quotes) are quoted, so the D2 compiles and the label is shown unchanged"
+      },
+      {
+        "description": "`generate`: an edge between nodes in different containers (`a.x -> b.y`) now joins those nodes and no longer creates new top-level ones"
+      }
+    ]
+  }
 }
