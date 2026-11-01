@@ -207,13 +207,17 @@ type DiagramSpec struct {
   node: `{From: "stage.item", To: "other.item"}`. Inside a container, a name is
   relative to that container. A node ID that contains a dot cannot be named by
   an edge.
+- **Reserved words are quoted.** An ID that D2 reserves, such as `label`, `shape`,
+  or `left`, is written in quotes so the diagram compiles. `layers`, `scenarios`,
+  and `steps` define boards in D2, so a container with one of those names cannot
+  have edges to or from its nodes.
 - **Classes are shared styles.** `DiagramSpec.Classes` defines them by name and a
   node, container, or edge names one with `Class`. They are written as D2
   `classes` and as Mermaid `classDef`s, in name order.
 
 ### Mermaid output
 
-`gen.Mermaid(spec)` writes the same spec as a Mermaid flowchart. Containers
+`gen.Mermaid(spec)` writes (the command line equivalent is `d2vision generate --to mermaid`) the same spec as a Mermaid flowchart. Containers
 become subgraphs and a node is named by its whole path, since Mermaid IDs are
 global. Mermaid has no grid layout, so `GridColumns` and `GridRows` are ignored,
 and a spec with sequences or tables is refused.
