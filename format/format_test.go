@@ -84,12 +84,12 @@ func TestMarshal(t *testing.T) {
 			t.Fatalf("Marshal() error = %v", err)
 		}
 		s := string(got)
-		// TOON should contain field names and values
-		if !strings.Contains(s, "Name") || !strings.Contains(s, "test") {
-			t.Errorf("Marshal() TOON output missing expected content: %q", s)
+		// TOON names a field by its json tag, as the other formats do.
+		if !strings.Contains(s, "name: test") {
+			t.Errorf("Marshal() TOON output missing 'name: test': %q", s)
 		}
-		if !strings.Contains(s, "Count") || !strings.Contains(s, "42") {
-			t.Errorf("Marshal() TOON output missing expected content: %q", s)
+		if !strings.Contains(s, "count: 42") {
+			t.Errorf("Marshal() TOON output missing 'count: 42': %q", s)
 		}
 	})
 }
