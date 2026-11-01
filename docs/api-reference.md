@@ -189,6 +189,7 @@ type DiagramSpec struct {
     Direction   string          `json:"direction,omitempty"`
     GridColumns int             `json:"gridColumns,omitempty"`
     GridRows    int             `json:"gridRows,omitempty"`
+    Classes     map[string]StyleSpec `json:"classes,omitempty"`
     Nodes       []NodeSpec      `json:"nodes,omitempty"`
     Containers  []ContainerSpec `json:"containers,omitempty"`
     Edges       []EdgeSpec      `json:"edges,omitempty"`
@@ -196,6 +197,26 @@ type DiagramSpec struct {
     Tables      []TableSpec     `json:"tables,omitempty"`
 }
 ```
+
+### Labels, edge endpoints, and classes
+
+- **Labels are written literally.** Text with characters D2 reads as syntax
+  (`:`, `;`, `{`, `}`, `#`, `$`, quotes) is written in single quotes, so it
+  reaches the diagram unchanged.
+- **Edge endpoints are paths.** A dot separates the containers on the way to a
+  node: `{From: "stage.item", To: "other.item"}`. Inside a container, a name is
+  relative to that container. A node ID that contains a dot cannot be named by
+  an edge.
+- **Classes are shared styles.** `DiagramSpec.Classes` defines them by name and a
+  node, container, or edge names one with `Class`. They are written as D2
+  `classes` and as Mermaid `classDef`s, in name order.
+
+### Mermaid output
+
+`gen.Mermaid(spec)` writes the same spec as a Mermaid flowchart. Containers
+become subgraphs and a node is named by its whole path, since Mermaid IDs are
+global. Mermaid has no grid layout, so `GridColumns` and `GridRows` are ignored,
+and a spec with sequences or tables is refused.
 
 ### ContainerSpec
 
