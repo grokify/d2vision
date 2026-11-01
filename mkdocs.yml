@@ -38,6 +38,46 @@ markdown_extensions:
   - toc:
       permalink: true
 
+plugins:
+  - search
+  - redirects:
+      # Pages that moved in v0.4.0. The old address sends the reader to the new one.
+      redirect_maps:
+        case-studies/fix-forward-chromedp-cdproto-toon.md: design/case-studies/fix-forward-chromedp-cdproto-toon.md
+        case-studies/index.md: design/case-studies/index.md
+        api-reference.md: guides/api-reference.md
+        commands/analyze.md: guides/commands/analyze.md
+        commands/card.md: guides/commands/card.md
+        commands/compact.md: guides/commands/compact.md
+        commands/convert.md: guides/commands/convert.md
+        commands/diff.md: guides/commands/diff.md
+        commands/generate.md: guides/commands/generate.md
+        commands/icons.md: guides/commands/icons.md
+        commands/index.md: guides/commands/index.md
+        commands/learn.md: guides/commands/learn.md
+        commands/lint.md: guides/commands/lint.md
+        commands/parse.md: guides/commands/parse.md
+        commands/pipeline.md: guides/commands/pipeline.md
+        commands/review.md: guides/commands/review.md
+        commands/rotate.md: guides/commands/rotate.md
+        commands/svg2gif.md: guides/commands/svg2gif.md
+        commands/template.md: guides/commands/template.md
+        commands/watch.md: guides/commands/watch.md
+        cookbook/containers.md: guides/cookbook/containers.md
+        cookbook/cross-container-edges.md: guides/cookbook/cross-container-edges.md
+        cookbook/index.md: guides/cookbook/index.md
+        cookbook/layout-engines.md: guides/cookbook/layout-engines.md
+        cookbook/layout-fundamentals.md: guides/cookbook/layout-fundamentals.md
+        cookbook/pipeline-use-cases.md: guides/cookbook/pipeline-use-cases.md
+        cookbook/sequence-diagrams.md: guides/cookbook/sequence-diagrams.md
+        cookbook/side-by-side.md: guides/cookbook/side-by-side.md
+        cookbook/sql-tables.md: guides/cookbook/sql-tables.md
+        cookbook/styling.md: guides/cookbook/styling.md
+        examples/index.md: guides/examples/index.md
+        getting-started.md: guides/getting-started.md
+        lint-rules.md: guides/lint-rules.md
+        troubleshooting.md: guides/troubleshooting.md
+
 nav:
   - Home: index.md
   - Getting Started: guides/getting-started.md
