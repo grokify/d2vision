@@ -72,6 +72,9 @@ nav:
       - Pipeline Use Cases: cookbook/pipeline-use-cases.md
   - Examples:
       - Overview: examples/index.md
+  - Case Studies:
+      - Overview: case-studies/index.md
+      - Fixing Forward Through Three Breaking Upgrades: case-studies/fix-forward-chromedp-cdproto-toon.md
   - Releases:
       - Overview: releases/index.md
       - v0.3.0: releases/v0.3.0.md

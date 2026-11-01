@@ -412,17 +412,17 @@ aws_lambda {
 ### TOON Example
 
 ```
-Version: 0.7.1
-ViewBox: "(0.00, 0.00, 847.00, 666.00)"
-Nodes[2]:
-  - ID: cluster1
-    Label: Cluster 1
-    Shape: rectangle
-    Bounds: "(0.00, 41.00, 418.00, 424.00)"
-  - ID: cluster2
-    Label: Cluster 2
-    Shape: rectangle
-    Bounds: "(458.00, 41.00, 187.00, 424.00)"
+version: 0.7.1
+viewBox: "(0.00, 0.00, 847.00, 666.00)"
+nodes[2]:
+  - id: cluster1
+    label: Cluster 1
+    shape: rectangle
+    bounds: "(0.00, 41.00, 418.00, 424.00)"
+  - id: cluster2
+    label: Cluster 2
+    shape: rectangle
+    bounds: "(458.00, 41.00, 187.00, 424.00)"
 ```
 
 ### JSON Example

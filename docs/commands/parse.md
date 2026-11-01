@@ -26,13 +26,13 @@ d2vision parse diagram.svg
 ```
 
 ```
-Version: 0.7.1
-ViewBox: "(0.00, 0.00, 847.00, 666.00)"
-Nodes[3]:
-  - ID: a
-    Label: a
-    Shape: rectangle
-    Bounds: "(50.00, 50.00, 100.00, 60.00)"
+version: 0.7.1
+viewBox: "(0.00, 0.00, 847.00, 666.00)"
+nodes[3]:
+  - id: a
+    label: a
+    shape: rectangle
+    bounds: "(50.00, 50.00, 100.00, 60.00)"
   ...
 ```
 
