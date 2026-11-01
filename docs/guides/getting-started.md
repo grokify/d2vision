@@ -156,6 +156,13 @@ d2vision template network-boundary > spec.toon
 d2vision generate spec.toon | d2 - output.svg
 ```
 
+### Write a Mermaid Flowchart
+
+```bash
+# The same spec as a Mermaid flowchart, for a README or a docs page
+d2vision generate spec.toon --to mermaid > diagram.mmd
+```
+
 ### Round-Trip Editing
 
 ```bash

@@ -119,6 +119,30 @@ names (`Nodes`, `Edges`, `GridColumns`) has no keys the reader recognizes.
 **Solution**: Rename the keys to lowercase, or write the spec again with
 `d2vision learn` or `d2vision template`, which use the current names.
 
+### D2 refuses a diagram with "reserved keywords are prohibited in edges"
+
+**Symptom**: `d2` reports `reserved keywords are prohibited in edges` for a
+diagram written by `generate`.
+
+**Cause**: A node or container has an ID that D2 reads as a setting, such as
+`label`, `shape`, `style`, `left`, or `top`. Before v0.5.0 `generate` wrote such
+an ID without quotes.
+
+**Solution**: Use v0.5.0 or later, which quotes these IDs. No change to the spec
+is needed.
+
+### D2 refuses a diagram with "cannot create edges between boards"
+
+**Symptom**: `d2` reports `cannot create edges between boards`.
+
+**Cause**: A container is named `layers`, `scenarios`, or `steps`, and an edge
+runs to or from a node inside it. D2 uses these words to define the boards of a
+multi-board diagram, so quoting does not help. A plain node with one of these
+names is fine.
+
+**Solution**: Give the container another ID, for example `layers_stack`. The
+label can still read "Layers".
+
 ---
 
 ## Parse Command Issues

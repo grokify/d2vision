@@ -1,6 +1,6 @@
 # generate
 
-Create D2 code from structured TOON, JSON, or YAML specifications.
+Create D2 code, or a Mermaid flowchart, from structured TOON, JSON, or YAML specifications.
 
 ## Usage
 
@@ -14,6 +14,7 @@ d2vision generate - [flags]  # Read from stdin
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-f, --format` | `toon` | Input format: toon, json, yaml. The format is not detected from the file name, so name it for JSON and YAML |
+| `--to` | `d2` | Output format: d2 or mermaid |
 
 ## Input Schema
 
@@ -131,37 +132,6 @@ style:
   bold: true
 ```
 
-### Labels
-
-A label is shown as written, whatever it holds. Text with characters D2 reads as
-syntax (`:`, `;`, `{`, `}`, `#`, `$`, quotes) is written in single quotes, so it
-compiles and appears unchanged. A line break in a label becomes a space.
-
-### Edge endpoints
-
-A dot separates the containers on the way to a node. `cluster1.db1` is the node
-`db1` in the container `cluster1`. Inside a container, a name is relative to that
-container. A node ID that itself contains a dot cannot be named by an edge.
-
-### Classes
-
-`classes` names a style once, and a node, container, or edge uses it with
-`class`. Classes are written in name order, so the same spec always gives the
-same D2.
-
-### Grid spacing
-
-With `gridColumns` or `gridRows`, `horizontalGap` and `verticalGap` set the space
-between cells. Leave room between columns when edges run between them.
-
-## Mermaid output
-
-The same spec can be written as a Mermaid flowchart from Go, with
-`generate.NewGenerator().Mermaid(spec)`. Containers become subgraphs, a node is
-named by its whole path (Mermaid IDs are global), and classes become `classDef`s.
-Mermaid has no grid, so `gridColumns` and `gridRows` are ignored, and a spec with
-sequences or tables is refused. See the [API reference](../api-reference.md).
-
 ### Special Diagrams
 
 Sequence diagrams and SQL tables are also supported:
@@ -184,3 +154,49 @@ tables:
         type: uuid
         constraints: [PK]
 ```
+
+### Labels
+
+A label is shown as written, whatever it holds. Text with characters D2 reads as
+syntax (`:`, `;`, `{`, `}`, `#`, `$`, quotes) is written in single quotes, so it
+compiles and appears unchanged. A line break in a label becomes a space.
+
+### Reserved words as names
+
+D2 reads words such as `label`, `shape`, `style`, `left`, `top`, `width`, and
+`class` as settings. A node or container with one of them as its ID is quoted,
+so `label` and `left` work as names. Three words are special even when quoted,
+because D2 uses them to define the boards of a multi-board diagram: `layers`,
+`scenarios`, and `steps`. A plain node can have one of these names, but a
+container that has one cannot have edges to or from the nodes inside it.
+
+### Edge endpoints
+
+A dot separates the containers on the way to a node. `cluster1.db1` is the node
+`db1` in the container `cluster1`. Inside a container, a name is relative to that
+container. A node ID that itself contains a dot cannot be named by an edge.
+
+### Classes
+
+`classes` names a style once, and a node, container, or edge uses it with
+`class`. Classes are written in name order, so the same spec always gives the
+same D2.
+
+### Grid spacing
+
+With `gridColumns` or `gridRows`, `horizontalGap` and `verticalGap` set the space
+between cells. Leave room between columns when edges run between them.
+
+## Mermaid output
+
+`--to mermaid` writes the same spec as a Mermaid flowchart:
+
+```bash
+d2vision generate spec.toon --to mermaid > diagram.mmd
+```
+
+Containers become subgraphs, a node is named by its whole path (Mermaid IDs are
+global), and classes become `classDef`s. Mermaid has no grid, so `gridColumns`
+and `gridRows` are ignored, and a spec with sequences or tables is refused with
+an error. From Go, the same output is `generate.NewGenerator().Mermaid(spec)`.
+See the [API reference](../api-reference.md).

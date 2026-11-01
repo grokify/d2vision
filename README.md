@@ -94,7 +94,7 @@ d2vision parse diagram.svg --for-generation
 
 ### Generate
 
-Create D2 code from structured TOON, JSON, or YAML specifications.
+Create D2 code, or a Mermaid flowchart, from structured TOON, JSON, or YAML specifications.
 
 ```bash
 # Generate from TOON spec
@@ -102,6 +102,9 @@ d2vision generate spec.toon > diagram.d2
 
 # Generate from JSON
 d2vision generate spec.json --format json > diagram.d2
+
+# Write a Mermaid flowchart instead of D2
+d2vision generate spec.toon --to mermaid > diagram.mmd
 
 # Pipe from stdin
 cat spec.toon | d2vision generate - > diagram.d2

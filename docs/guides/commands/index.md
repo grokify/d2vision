@@ -7,7 +7,7 @@ d2vision provides commands for working with D2 diagrams.
 | Command | Description |
 |---------|-------------|
 | [parse](parse.md) | Extract structure from D2-generated SVGs |
-| [generate](generate.md) | Create D2 code from structured specifications |
+| [generate](generate.md) | Create D2 code, or a Mermaid flowchart, from structured specifications |
 | [template](template.md) | Generate common diagram patterns |
 | [pipeline](pipeline.md) | Generate workflow diagrams from PipelineSpec |
 | [convert](convert.md) | Convert Mermaid/PlantUML diagrams to D2 |
