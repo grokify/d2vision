@@ -11,7 +11,7 @@ were merged together, and `main` stopped building.
 |---|---|
 | **Symptom** | CI and `go test ./...` failed with `missing go.sum entry for module providing package github.com/gobwas/ws` |
 | **Where it appeared** | On a pull request for an unrelated feature, which looked like the cause and was not |
-| **Real cause** | Three Dependabot updates, each fine alone, were merged one after another and left `go.mod` inconsistent |
+| **Real cause** | Three Dependabot updates were merged one after another and left `go.mod` inconsistent |
 | **Dependencies** | `chromedp` v0.16.0 to v0.21.0, `cdproto` to v0.159.0, `toon-go` to v1.0.1 |
 | **Size of the fix** | One file ported (15 lines added, 13 removed), one test added, two documentation samples and one test expectation updated |
 | **Outcome** | All three taken forward. `main` builds and all tests pass |
@@ -22,6 +22,10 @@ Three Dependabot pull requests were open at once: chromedp to v0.21.0 (#28),
 toon-go to v1.0.1 (#29), and cdproto to v0.158.6 (#37). Each was written against
 the `go.mod` that `main` had when it was opened. They were merged one after
 another, and the merges of `go.mod` and `go.sum` did not agree.
+
+The CI results for those three pull requests are no longer available, so we
+cannot say whether any of them passed on its own. What we can show is that
+`main` built before the first of them and did not build after the third.
 
 The result listed chromedp v0.16.0, the old version, beside the new cdproto, and
 did not list the modules chromedp v0.16.0 needs. Nothing that imported chromedp
@@ -79,12 +83,19 @@ have been the cheaper commit and the more expensive decision.
   error. The changelog says so. The deeper fix is to fail loudly when a spec has
   no recognized keys, which is still open.
 
-## What we would change in the process
+## How we take dependency updates
 
-| Gap | Change |
-|-----|--------|
-| Three updates merged together without being rebuilt | Group updates that must move together (chromedp with cdproto), and require a pull request to be up to date with `main` before it merges |
-| `main` was broken by merges that each passed alone | Run the full build and tests after every merge to `main`, and treat a failure there as the top priority |
+Dependency updates are merged to `main` as they arrive. `main` may break. The
+fix is made locally and goes forward: take the new version and port the code.
+We do not pin back to postpone the work, unless we know of a reason to, such as
+a transitive dependency that needs the old version.
+
+A broken `main` costs a diagnosis, and the first step is to find where it first
+broke. Three things make that step and the fix cheaper:
+
+| Need | What we do |
+|------|------------|
+| Find which change broke the build | Build the commit before each recent merge, as in this case, and read the upstream migration notes first |
 | A code path with no test | Cover every path that reaches outside the process, such as a browser, with a test that skips when the tool is missing |
 | A format change that fails silently | A consumer that cannot read its input should say so and not produce nothing |
 
@@ -136,5 +147,5 @@ have to be applied to it by hand as well as to the current one.
 
 What made fix-forward cheap was that each upstream change was documented, so
 the port was mechanical. What made it safe was checking the real output. What
-nearly made it expensive was the process gap: that three updates could break
-`main` together without anyone being told which one to read.
+cost the most was the diagnosis: three updates had broken `main` together, and
+the failure appeared on an unrelated merge.
