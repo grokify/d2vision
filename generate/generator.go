@@ -251,10 +251,26 @@ func (g *Generator) isEmptyStyle(s *StyleSpec) bool {
 		s.BorderRadius == nil && s.FontSize == nil && s.Opacity == nil && s.FontColor == "" && s.Bold == nil
 }
 
-// escapeID escapes a D2 ID if it contains special characters.
+// reservedKeywords are the words D2 reads as settings and not as names. An ID
+// that is one of them must be quoted, or D2 refuses the diagram: a node named
+// "label" or "left" is otherwise a syntax error. The list is checked against
+// D2's own in the tests.
+var reservedKeywords = map[string]bool{
+	"3d": true, "animated": true, "bold": true, "border-radius": true, "class": true, "classes": true,
+	"constraint": true, "direction": true, "double-border": true, "fill": true, "fill-pattern": true,
+	"filled": true, "font": true, "font-color": true, "font-size": true, "grid-columns": true,
+	"grid-gap": true, "grid-rows": true, "height": true, "horizontal-gap": true, "icon": true,
+	"italic": true, "label": true, "layers": true, "left": true, "link": true, "multiple": true,
+	"near": true, "opacity": true, "scenarios": true, "shadow": true, "shape": true,
+	"source-arrowhead": true, "steps": true, "stroke": true, "stroke-dash": true, "stroke-width": true,
+	"style": true, "target-arrowhead": true, "text-transform": true, "tooltip": true, "top": true,
+	"underline": true, "vars": true, "vertical-gap": true, "width": true,
+}
+
+// escapeID quotes an ID that D2 would not read as a plain name: one with a
+// space, dot, dash, or colon, or one that is a reserved word.
 func (g *Generator) escapeID(id string) string {
-	// Check if ID needs quoting (contains spaces, dots, or special chars)
-	needsQuote := false
+	needsQuote := reservedKeywords[strings.ToLower(id)]
 	for _, c := range id {
 		if c == ' ' || c == '-' || c == '.' || c == ':' {
 			needsQuote = true
