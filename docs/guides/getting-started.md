@@ -130,7 +130,7 @@ d2vision svg2gif diagram.svg -o diagram.gif
 
 | Format | Flag | Description |
 |--------|------|-------------|
-| TOON | `--format toon` | Token-efficient (default, ~40% fewer tokens) |
+| TOON | `--format toon` | Token-efficient (default, ~40% fewer tokens). Fields are named by their JSON name, for example `viewBox` and `nodes` |
 | JSON | `--format json` | Standard JSON |
 | JSON Compact | `--format json-compact` | Minified JSON |
 | YAML | `--format yaml` | YAML format |

@@ -10,6 +10,84 @@
   ],
   "releases": [
     {
+      "version": "v0.4.0",
+      "date": "2026-11-01",
+      "highlights": [
+        {
+          "description": "`generate` writes labels that D2 reads as written, and edges between nodes in different containers now join those nodes"
+        },
+        {
+          "description": "A diagram spec can be written as a Mermaid flowchart, with shared classes for both D2 and Mermaid"
+        },
+        {
+          "description": "TOON output names fields by their JSON names, following toon-go v1.0 (breaking for `.toon` files written with capitalized keys)"
+        },
+        {
+          "description": "chromedp v0.21.0 and cdproto v0.159.0, with PNG and GIF capture moved to chromedp's typed API"
+        },
+        {
+          "description": "Documentation follows a standard layout, with user guides under `docs/guides` (breaking for links to the documentation site)"
+        }
+      ],
+      "added": [
+        {
+          "description": "`generate`: shared `classes` for nodes, containers, and edges, written as D2 classes and Mermaid classDefs"
+        },
+        {
+          "description": "`generate`: `Mermaid` writes a spec as a Mermaid flowchart, with containers as subgraphs"
+        },
+        {
+          "description": "`generate`: style fields `fontColor` and `bold`"
+        },
+        {
+          "description": "`generate`: grid spacing with `horizontalGap` and `verticalGap`, for diagrams whose edges run between grid columns"
+        }
+      ],
+      "changed": [
+        {
+          "description": "TOON output names each field by its json tag (`version`, `viewBox`, `nodes`), following toon-go v1.0, where it wrote Go field names (`Version`, `ViewBox`, `Nodes`). A `.toon` spec written with the old capitalized names generates nothing and must be renamed to lowercase"
+        },
+        {
+          "description": "Upgrade chromedp to v0.21.0 and cdproto to v0.159.0, and move PNG and GIF capture to chromedp's typed API"
+        },
+        {
+          "description": "The documentation site has new URLs: guides, commands, cookbook, examples, the API reference, the lint rules, and troubleshooting moved under `guides/`, and the case study under `design/case-studies/`"
+        }
+      ],
+      "fixed": [
+        {
+          "description": "`generate`: labels with characters D2 reads as syntax (`:`, `;`, `{`, `}`, `#`, `$`, quotes) are quoted, so the D2 compiles and the label is shown unchanged"
+        },
+        {
+          "description": "`generate`: an edge between nodes in different containers (`a.x -> b.y`) now joins those nodes and no longer creates new top-level ones"
+        }
+      ],
+      "documentation": [
+        {
+          "description": "Case study on fixing forward through three breaking upgrades, with how chromedp, cdproto, toon-go, and kin-openapi ship their releases"
+        },
+        {
+          "description": "Guides updated for labels, edge paths, classes, grid spacing, Mermaid output, and the TOON key names; troubleshooting entry for `.toon` files written with capitalized keys"
+        },
+        {
+          "description": "The generate page no longer says the input format is detected from the file name; the default is TOON"
+        }
+      ],
+      "tests": [
+        {
+          "description": "Generated D2 is compiled with the embedded engine and every label, node, and connection is checked"
+        },
+        {
+          "description": "Chrome rendering of an SVG to PNG is tested, and skipped when Chrome is not installed"
+        }
+      ],
+      "build": [
+        {
+          "description": "Repair a `go.mod` that three dependency updates had left inconsistent, and bring toon-go to v1.0.1"
+        }
+      ]
+    },
+    {
       "version": "v0.3.0",
       "date": "2026-09-28",
       "highlights": [
@@ -360,34 +438,5 @@
         }
       ]
     }
-  ],
-  "unreleased": {
-    "added": [
-      {
-        "description": "`generate`: shared `classes` for nodes, containers, and edges, written as D2 classes and Mermaid classDefs"
-      },
-      {
-        "description": "`generate`: `Mermaid` writes a spec as a Mermaid flowchart, with containers as subgraphs"
-      },
-      {
-        "description": "`generate`: style fields `fontColor` and `bold`"
-      }
-    ],
-    "fixed": [
-      {
-        "description": "`generate`: labels with characters D2 reads as syntax (`:`, `;`, `{`, `}`, `#`, `$`, quotes) are quoted, so the D2 compiles and the label is shown unchanged"
-      },
-      {
-        "description": "`generate`: an edge between nodes in different containers (`a.x -> b.y`) now joins those nodes and no longer creates new top-level ones"
-      }
-    ],
-    "changed": [
-      {
-        "description": "TOON output names each field by its json tag (`version`, `viewBox`, `nodes`), following toon-go v1.0, where it wrote Go field names (`Version`, `ViewBox`, `Nodes`). A `.toon` spec written with the old capitalized names generates nothing and must be renamed to lowercase"
-      },
-      {
-        "description": "Upgrade chromedp to v0.21.0 and cdproto to v0.159.0, and move PNG and GIF capture to chromedp's typed API"
-      }
-    ]
-  }
+  ]
 }

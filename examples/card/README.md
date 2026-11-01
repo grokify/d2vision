@@ -21,4 +21,4 @@ d2vision card render examples/card/request-flow.card.json \
 d2vision svg2gif request-flow.svg -o request-flow.gif
 ```
 
-Open the `.svg` in a browser to see the dots move. See the [card command guide](../../docs/commands/card.md) for the full definition format.
+Open the `.svg` in a browser to see the dots move. See the [card command guide](../../docs/guides/commands/card.md) for the full definition format.

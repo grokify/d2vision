@@ -105,6 +105,22 @@ d2vision convert --from plantuml diagram.txt
 
 ---
 
+## Generate Command Issues
+
+### `generate` prints nothing from a `.toon` file
+
+**Symptom**: `d2vision generate spec.toon` exits without an error and prints
+nothing, or less than the file describes.
+
+**Cause**: Since v0.4.0, TOON uses each field's JSON name, so keys are lowercase
+(`nodes`, `edges`, `gridColumns`). A file written with the earlier capitalized
+names (`Nodes`, `Edges`, `GridColumns`) has no keys the reader recognizes.
+
+**Solution**: Rename the keys to lowercase, or write the spec again with
+`d2vision learn` or `d2vision template`, which use the current names.
+
+---
+
 ## Parse Command Issues
 
 ### Empty or minimal output from parse
