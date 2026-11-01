@@ -13,7 +13,7 @@ d2vision generate - [flags]  # Read from stdin
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `-f, --format` | auto-detect | Input format: toon, json, yaml |
+| `-f, --format` | `toon` | Input format: toon, json, yaml. The format is not detected from the file name, so name it for JSON and YAML |
 
 ## Input Schema
 
@@ -24,12 +24,21 @@ The `DiagramSpec` structure defines the diagram:
 direction: right          # right, down, left, up
 gridColumns: 2            # Force grid layout
 gridRows: 2
+horizontalGap: 90         # Space between grid cells, in pixels
+verticalGap: 24
+
+# Shared styles, named once and used by class
+classes:
+  input:
+    fill: "#fff1dc"
+    stroke: "#e08a1e"
 
 # Top-level nodes
 nodes:
   - id: external
     label: External Service
     shape: cloud
+    class: input
 
 # Containers (clusters/boundaries)
 containers:
@@ -66,7 +75,7 @@ d2vision generate spec.toon > diagram.d2
 ### Generate from JSON
 
 ```bash
-d2vision generate spec.json > diagram.d2
+d2vision generate -f json spec.json > diagram.d2
 ```
 
 ### Pipe from stdin
@@ -118,7 +127,40 @@ style:
   borderRadius: 8
   fontSize: 14
   opacity: 0.8
+  fontColor: "#111111"
+  bold: true
 ```
+
+### Labels
+
+A label is shown as written, whatever it holds. Text with characters D2 reads as
+syntax (`:`, `;`, `{`, `}`, `#`, `$`, quotes) is written in single quotes, so it
+compiles and appears unchanged. A line break in a label becomes a space.
+
+### Edge endpoints
+
+A dot separates the containers on the way to a node. `cluster1.db1` is the node
+`db1` in the container `cluster1`. Inside a container, a name is relative to that
+container. A node ID that itself contains a dot cannot be named by an edge.
+
+### Classes
+
+`classes` names a style once, and a node, container, or edge uses it with
+`class`. Classes are written in name order, so the same spec always gives the
+same D2.
+
+### Grid spacing
+
+With `gridColumns` or `gridRows`, `horizontalGap` and `verticalGap` set the space
+between cells. Leave room between columns when edges run between them.
+
+## Mermaid output
+
+The same spec can be written as a Mermaid flowchart from Go, with
+`generate.NewGenerator().Mermaid(spec)`. Containers become subgraphs, a node is
+named by its whole path (Mermaid IDs are global), and classes become `classDef`s.
+Mermaid has no grid, so `gridColumns` and `gridRows` are ignored, and a spec with
+sequences or tables is refused. See the [API reference](../api-reference.md).
 
 ### Special Diagrams
 
