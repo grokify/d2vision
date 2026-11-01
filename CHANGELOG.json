@@ -10,6 +10,58 @@
   ],
   "releases": [
     {
+      "version": "v0.5.0",
+      "date": "2026-11-01",
+      "highlights": [
+        {
+          "description": "`generate --to mermaid` writes the spec as a Mermaid flowchart from the command line"
+        },
+        {
+          "description": "`generate` quotes IDs that D2 reserves, such as `label`, `shape`, `style`, and `left`, so the diagram compiles"
+        },
+        {
+          "description": "The documentation pages that moved in v0.4.0 redirect from their old addresses, keeping any anchor"
+        }
+      ],
+      "added": [
+        {
+          "description": "`generate --to mermaid` writes the spec as a Mermaid flowchart, where before it was only available from Go"
+        }
+      ],
+      "fixed": [
+        {
+          "description": "`generate`: an ID that D2 reserves, such as `label`, `shape`, `style`, `left`, `top`, or `class`, is quoted, so the diagram compiles. `layers`, `scenarios`, and `steps` define boards in D2, so a container with one of those names still cannot have edges to or from its nodes"
+        },
+        {
+          "description": "The `generate` help said the input format is detected from the file name; the default is TOON"
+        }
+      ],
+      "documentation": [
+        {
+          "description": "The pages that moved in v0.4.0 redirect from their old addresses, keeping any `#anchor`"
+        },
+        {
+          "description": "Guides cover `--to mermaid` and reserved words as names"
+        },
+        {
+          "description": "Troubleshooting entries for the two errors D2 gives for reserved words, and the Mermaid flag in the README, getting started, and the commands index"
+        }
+      ],
+      "tests": [
+        {
+          "description": "Every word D2 reserves is checked as a node, a container, and an edge endpoint against D2's own list"
+        },
+        {
+          "description": "Plain nodes named like a D2 board word are checked to compile, and the CLI's D2 and Mermaid output and its errors are tested"
+        }
+      ],
+      "build": [
+        {
+          "description": "The documentation build installs from `requirements.txt` and uses mkdocs-redirects"
+        }
+      ]
+    },
+    {
       "version": "v0.4.0",
       "date": "2026-11-01",
       "highlights": [
@@ -438,38 +490,5 @@
         }
       ]
     }
-  ],
-  "unreleased": {
-    "added": [
-      {
-        "description": "`generate --to mermaid` writes the spec as a Mermaid flowchart, where before it was only available from Go"
-      }
-    ],
-    "fixed": [
-      {
-        "description": "`generate`: an ID that D2 reserves, such as `label`, `shape`, `style`, `left`, `top`, or `class`, is quoted, so the diagram compiles. `layers`, `scenarios`, and `steps` define boards in D2 and still cannot be used as names"
-      },
-      {
-        "description": "The `generate` help said the input format is detected from the file name; the default is TOON"
-      }
-    ],
-    "documentation": [
-      {
-        "description": "The pages that moved in v0.4.0 redirect from their old addresses, keeping any `#anchor`"
-      },
-      {
-        "description": "Guides cover `--to mermaid` and reserved words as names"
-      }
-    ],
-    "tests": [
-      {
-        "description": "Every word D2 reserves is checked as a node, a container, and an edge endpoint against D2's own list"
-      }
-    ],
-    "build": [
-      {
-        "description": "The documentation build installs from `requirements.txt` and uses mkdocs-redirects"
-      }
-    ]
-  }
+  ]
 }
