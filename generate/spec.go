@@ -8,6 +8,9 @@ type DiagramSpec struct {
 	Direction   string `json:"direction,omitempty" yaml:"direction,omitempty"`     // right, down, left, up
 	GridColumns int    `json:"gridColumns,omitempty" yaml:"gridColumns,omitempty"` // Force grid layout
 	GridRows    int    `json:"gridRows,omitempty" yaml:"gridRows,omitempty"`
+	// HorizontalGap and VerticalGap are the space between grid cells, in pixels.
+	HorizontalGap int `json:"horizontalGap,omitempty" yaml:"horizontalGap,omitempty"`
+	VerticalGap   int `json:"verticalGap,omitempty" yaml:"verticalGap,omitempty"`
 
 	// Classes are named styles shared by nodes, containers, and edges that name
 	// them with Class. They are written as D2 classes and as Mermaid classDefs.
@@ -32,6 +35,9 @@ type ContainerSpec struct {
 	Direction   string `json:"direction,omitempty" yaml:"direction,omitempty"`
 	GridColumns int    `json:"gridColumns,omitempty" yaml:"gridColumns,omitempty"`
 	GridRows    int    `json:"gridRows,omitempty" yaml:"gridRows,omitempty"`
+	// HorizontalGap and VerticalGap are the space between grid cells, in pixels.
+	HorizontalGap int `json:"horizontalGap,omitempty" yaml:"horizontalGap,omitempty"`
+	VerticalGap   int `json:"verticalGap,omitempty" yaml:"verticalGap,omitempty"`
 
 	// Style
 	Style *StyleSpec `json:"style,omitempty" yaml:"style,omitempty"`

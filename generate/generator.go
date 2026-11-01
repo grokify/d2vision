@@ -28,12 +28,18 @@ func (g *Generator) Generate(spec *DiagramSpec) string {
 	if spec.GridRows > 0 {
 		fmt.Fprintf(&b, "grid-rows: %d\n", spec.GridRows)
 	}
+	if spec.HorizontalGap > 0 {
+		fmt.Fprintf(&b, "horizontal-gap: %d\n", spec.HorizontalGap)
+	}
+	if spec.VerticalGap > 0 {
+		fmt.Fprintf(&b, "vertical-gap: %d\n", spec.VerticalGap)
+	}
 	if spec.Direction != "" {
 		fmt.Fprintf(&b, "direction: %s\n", spec.Direction)
 	}
 
 	// Add blank line after root settings if any were written
-	if spec.GridColumns > 0 || spec.GridRows > 0 || spec.Direction != "" {
+	if spec.GridColumns > 0 || spec.GridRows > 0 || spec.HorizontalGap > 0 || spec.VerticalGap > 0 || spec.Direction != "" {
 		b.WriteString("\n")
 	}
 
@@ -92,6 +98,12 @@ func (g *Generator) generateContainer(b *strings.Builder, c ContainerSpec, depth
 	if c.GridRows > 0 {
 		fmt.Fprintf(b, "%sgrid-rows: %d\n", innerIndent, c.GridRows)
 	}
+	if c.HorizontalGap > 0 {
+		fmt.Fprintf(b, "%shorizontal-gap: %d\n", innerIndent, c.HorizontalGap)
+	}
+	if c.VerticalGap > 0 {
+		fmt.Fprintf(b, "%svertical-gap: %d\n", innerIndent, c.VerticalGap)
+	}
 
 	if c.Class != "" {
 		fmt.Fprintf(b, "%sclass: %s\n", innerIndent, g.escapeID(c.Class))
@@ -101,7 +113,7 @@ func (g *Generator) generateContainer(b *strings.Builder, c ContainerSpec, depth
 	g.generateStyle(b, c.Style, depth+1)
 
 	// Add blank line after settings if any were written
-	hasSettings := c.Direction != "" || c.GridColumns > 0 || c.GridRows > 0 || c.Class != "" || !g.isEmptyStyle(c.Style)
+	hasSettings := c.Direction != "" || c.GridColumns > 0 || c.GridRows > 0 || c.HorizontalGap > 0 || c.VerticalGap > 0 || c.Class != "" || !g.isEmptyStyle(c.Style)
 	if hasSettings && (len(c.Nodes) > 0 || len(c.Containers) > 0) {
 		b.WriteString("\n")
 	}
