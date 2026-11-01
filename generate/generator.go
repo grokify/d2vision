@@ -2,7 +2,9 @@ package generate
 
 import (
 	"fmt"
+	"sort"
 	"strings"
+	"unicode"
 )
 
 // Generator converts DiagramSpec to D2 code.
@@ -34,6 +36,8 @@ func (g *Generator) Generate(spec *DiagramSpec) string {
 	if spec.GridColumns > 0 || spec.GridRows > 0 || spec.Direction != "" {
 		b.WriteString("\n")
 	}
+
+	g.generateClasses(&b, spec.Classes)
 
 	// Generate containers
 	for _, container := range spec.Containers {
@@ -69,14 +73,11 @@ func (g *Generator) Generate(spec *DiagramSpec) string {
 func (g *Generator) generateContainer(b *strings.Builder, c ContainerSpec, depth int) {
 	indent := strings.Repeat(g.indent, depth)
 
-	// Container declaration
-	if c.Label != "" && c.Label != c.ID {
-		fmt.Fprintf(b, "%s%s: %s {\n", indent, g.escapeID(c.ID), c.Label)
-	} else if c.Label == "" {
-		// Empty label - invisible container for layout purposes
+	// Container declaration. An empty label makes an invisible container.
+	if c.Label == "" {
 		fmt.Fprintf(b, "%s%s: \"\" {\n", indent, g.escapeID(c.ID))
 	} else {
-		fmt.Fprintf(b, "%s%s: %s {\n", indent, g.escapeID(c.ID), c.Label)
+		fmt.Fprintf(b, "%s%s: %s {\n", indent, g.escapeID(c.ID), g.label(c.Label))
 	}
 
 	innerIndent := strings.Repeat(g.indent, depth+1)
@@ -92,11 +93,15 @@ func (g *Generator) generateContainer(b *strings.Builder, c ContainerSpec, depth
 		fmt.Fprintf(b, "%sgrid-rows: %d\n", innerIndent, c.GridRows)
 	}
 
+	if c.Class != "" {
+		fmt.Fprintf(b, "%sclass: %s\n", innerIndent, g.escapeID(c.Class))
+	}
+
 	// Container style
 	g.generateStyle(b, c.Style, depth+1)
 
 	// Add blank line after settings if any were written
-	hasSettings := c.Direction != "" || c.GridColumns > 0 || c.GridRows > 0 || !g.isEmptyStyle(c.Style)
+	hasSettings := c.Direction != "" || c.GridColumns > 0 || c.GridRows > 0 || c.Class != "" || !g.isEmptyStyle(c.Style)
 	if hasSettings && (len(c.Nodes) > 0 || len(c.Containers) > 0) {
 		b.WriteString("\n")
 	}
@@ -128,12 +133,12 @@ func (g *Generator) generateNode(b *strings.Builder, n NodeSpec, depth int) {
 	indent := strings.Repeat(g.indent, depth)
 
 	// Check if node needs a block (has shape, icon, or style)
-	needsBlock := n.Shape != "" || n.Icon != "" || !g.isEmptyStyle(n.Style)
+	needsBlock := n.Shape != "" || n.Icon != "" || n.Class != "" || !g.isEmptyStyle(n.Style)
 
 	if !needsBlock {
 		// Simple node: just ID and optional label
 		if n.Label != "" && n.Label != n.ID {
-			fmt.Fprintf(b, "%s%s: %s\n", indent, g.escapeID(n.ID), n.Label)
+			fmt.Fprintf(b, "%s%s: %s\n", indent, g.escapeID(n.ID), g.label(n.Label))
 		} else {
 			fmt.Fprintf(b, "%s%s\n", indent, g.escapeID(n.ID))
 		}
@@ -142,13 +147,16 @@ func (g *Generator) generateNode(b *strings.Builder, n NodeSpec, depth int) {
 
 	// Node with properties
 	if n.Label != "" && n.Label != n.ID {
-		fmt.Fprintf(b, "%s%s: %s {\n", indent, g.escapeID(n.ID), n.Label)
+		fmt.Fprintf(b, "%s%s: %s {\n", indent, g.escapeID(n.ID), g.label(n.Label))
 	} else {
 		fmt.Fprintf(b, "%s%s: {\n", indent, g.escapeID(n.ID))
 	}
 
 	innerIndent := strings.Repeat(g.indent, depth+1)
 
+	if n.Class != "" {
+		fmt.Fprintf(b, "%sclass: %s\n", innerIndent, g.escapeID(n.Class))
+	}
 	if n.Shape != "" {
 		fmt.Fprintf(b, "%sshape: %s\n", innerIndent, n.Shape)
 	}
@@ -171,16 +179,19 @@ func (g *Generator) generateEdge(b *strings.Builder, e EdgeSpec, depth int) {
 	}
 
 	// Edge declaration
-	edgeStr := fmt.Sprintf("%s%s %s %s", indent, g.escapeID(e.From), arrow, g.escapeID(e.To))
+	edgeStr := fmt.Sprintf("%s%s %s %s", indent, g.ref(e.From), arrow, g.ref(e.To))
 
 	// Add label if present
 	if e.Label != "" {
-		edgeStr += fmt.Sprintf(": %s", e.Label)
+		edgeStr += ": " + g.label(e.Label)
 	}
 
 	// Check if edge needs a block for style
-	if !g.isEmptyStyle(e.Style) {
+	if e.Class != "" || !g.isEmptyStyle(e.Style) {
 		b.WriteString(edgeStr + " {\n")
+		if e.Class != "" {
+			fmt.Fprintf(b, "%sclass: %s\n", strings.Repeat(g.indent, depth+1), g.escapeID(e.Class))
+		}
 		g.generateStyle(b, e.Style, depth+1)
 		fmt.Fprintf(b, "%s}\n", indent)
 	} else {
@@ -212,6 +223,12 @@ func (g *Generator) generateStyle(b *strings.Builder, s *StyleSpec, depth int) {
 	if s.Opacity != nil && *s.Opacity > 0 && *s.Opacity < 1 {
 		fmt.Fprintf(b, "%sstyle.opacity: %.2f\n", indent, *s.Opacity)
 	}
+	if s.FontColor != "" {
+		fmt.Fprintf(b, "%sstyle.font-color: %q\n", indent, s.FontColor)
+	}
+	if s.Bold != nil {
+		fmt.Fprintf(b, "%sstyle.bold: %t\n", indent, *s.Bold)
+	}
 }
 
 func (g *Generator) isEmptyStyle(s *StyleSpec) bool {
@@ -219,7 +236,7 @@ func (g *Generator) isEmptyStyle(s *StyleSpec) bool {
 		return true
 	}
 	return s.Fill == "" && s.Stroke == "" && s.StrokeWidth == nil &&
-		s.BorderRadius == nil && s.FontSize == nil && s.Opacity == nil
+		s.BorderRadius == nil && s.FontSize == nil && s.Opacity == nil && s.FontColor == "" && s.Bold == nil
 }
 
 // escapeID escapes a D2 ID if it contains special characters.
@@ -244,7 +261,7 @@ func (g *Generator) generateSequence(b *strings.Builder, seq SequenceSpec, depth
 
 	// Sequence diagram container
 	if seq.Label != "" {
-		fmt.Fprintf(b, "%s%s: %s {\n", indent, g.escapeID(seq.ID), seq.Label)
+		fmt.Fprintf(b, "%s%s: %s {\n", indent, g.escapeID(seq.ID), g.label(seq.Label))
 	} else {
 		fmt.Fprintf(b, "%s%s {\n", indent, g.escapeID(seq.ID))
 	}
@@ -257,7 +274,7 @@ func (g *Generator) generateSequence(b *strings.Builder, seq SequenceSpec, depth
 	// Define actors (optional, but helps control order)
 	for _, actor := range seq.Actors {
 		if actor.Label != "" && actor.Label != actor.ID {
-			fmt.Fprintf(b, "%s%s: %s", innerIndent, g.escapeID(actor.ID), actor.Label)
+			fmt.Fprintf(b, "%s%s: %s", innerIndent, g.escapeID(actor.ID), g.label(actor.Label))
 		} else {
 			fmt.Fprintf(b, "%s%s", innerIndent, g.escapeID(actor.ID))
 		}
@@ -274,7 +291,7 @@ func (g *Generator) generateSequence(b *strings.Builder, seq SequenceSpec, depth
 	// Generate messages in order
 	for _, msg := range seq.Steps {
 		if msg.Label != "" {
-			fmt.Fprintf(b, "%s%s -> %s: %s\n", innerIndent, g.escapeID(msg.From), g.escapeID(msg.To), msg.Label)
+			fmt.Fprintf(b, "%s%s -> %s: %s\n", innerIndent, g.escapeID(msg.From), g.escapeID(msg.To), g.label(msg.Label))
 		} else {
 			fmt.Fprintf(b, "%s%s -> %s\n", innerIndent, g.escapeID(msg.From), g.escapeID(msg.To))
 		}
@@ -284,14 +301,14 @@ func (g *Generator) generateSequence(b *strings.Builder, seq SequenceSpec, depth
 	for _, group := range seq.Groups {
 		b.WriteString("\n")
 		if group.Label != "" {
-			fmt.Fprintf(b, "%s%s: %s {\n", innerIndent, g.escapeID(group.ID), group.Label)
+			fmt.Fprintf(b, "%s%s: %s {\n", innerIndent, g.escapeID(group.ID), g.label(group.Label))
 		} else {
 			fmt.Fprintf(b, "%s%s {\n", innerIndent, g.escapeID(group.ID))
 		}
 		groupIndent := strings.Repeat(g.indent, depth+2)
 		for _, msg := range group.Messages {
 			if msg.Label != "" {
-				fmt.Fprintf(b, "%s%s -> %s: %s\n", groupIndent, g.escapeID(msg.From), g.escapeID(msg.To), msg.Label)
+				fmt.Fprintf(b, "%s%s -> %s: %s\n", groupIndent, g.escapeID(msg.From), g.escapeID(msg.To), g.label(msg.Label))
 			} else {
 				fmt.Fprintf(b, "%s%s -> %s\n", groupIndent, g.escapeID(msg.From), g.escapeID(msg.To))
 			}
@@ -308,7 +325,7 @@ func (g *Generator) generateTable(b *strings.Builder, table TableSpec, depth int
 
 	// Table declaration
 	if table.Label != "" && table.Label != table.ID {
-		fmt.Fprintf(b, "%s%s: %s {\n", indent, g.escapeID(table.ID), table.Label)
+		fmt.Fprintf(b, "%s%s: %s {\n", indent, g.escapeID(table.ID), g.label(table.Label))
 	} else {
 		fmt.Fprintf(b, "%s%s {\n", indent, g.escapeID(table.ID))
 	}
@@ -332,4 +349,65 @@ func (g *Generator) generateTable(b *strings.Builder, table TableSpec, depth int
 	}
 
 	fmt.Fprintf(b, "%s}\n", indent)
+}
+
+// generateClasses writes the shared styles as a D2 classes block, in name order
+// so the output is the same every time.
+func (g *Generator) generateClasses(b *strings.Builder, classes map[string]StyleSpec) {
+	if len(classes) == 0 {
+		return
+	}
+	names := make([]string, 0, len(classes))
+	for name := range classes {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	b.WriteString("classes: {\n")
+	for _, name := range names {
+		style := classes[name]
+		fmt.Fprintf(b, "%s%s: {\n", g.indent, g.escapeID(name))
+		g.generateStyle(b, &style, 2)
+		fmt.Fprintf(b, "%s}\n", g.indent)
+	}
+	b.WriteString("}\n\n")
+}
+
+// ref writes an edge endpoint. A dot separates the containers on the way to a
+// node, so each part is written as its own key.
+func (g *Generator) ref(path string) string {
+	parts := strings.Split(path, ".")
+	for i, p := range parts {
+		parts[i] = g.escapeID(p)
+	}
+	return strings.Join(parts, ".")
+}
+
+// label writes label text so D2 reads it literally. Plain text is written as
+// is. Anything else is written in single quotes, where D2 does no
+// substitution and no escaping other than doubling a single quote. A line
+// break becomes a space.
+func (g *Generator) label(text string) string {
+	text = strings.Join(strings.Fields(text), " ")
+	if text == "" {
+		return `""`
+	}
+	if plainLabel(text) {
+		return text
+	}
+	return "'" + strings.ReplaceAll(text, "'", "''") + "'"
+}
+
+// plainLabel reports whether D2 reads the text literally without quotes: it
+// starts with a letter or digit and holds only letters, digits, spaces, and a
+// few punctuation marks.
+func plainLabel(s string) bool {
+	for i, r := range s {
+		switch {
+		case unicode.IsLetter(r) || unicode.IsDigit(r):
+		case i > 0 && strings.ContainsRune(" ,.()/&_%+?!-", r):
+		default:
+			return false
+		}
+	}
+	return true
 }
