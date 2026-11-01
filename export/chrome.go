@@ -15,6 +15,7 @@ import (
 	"image/png"
 	"time"
 
+	"github.com/chromedp/cdproto/cdp"
 	"github.com/chromedp/cdproto/page"
 	"github.com/chromedp/chromedp"
 )
@@ -60,15 +61,16 @@ func Open(ctx context.Context, svg []byte, o Options) (*Session, error) {
 	cancel := func() { cancelBrowser(); cancelAlloc(); cancelTimeout() }
 
 	doc := `<!doctype html><html><head><meta charset="utf-8"></head><body style="margin:0;overflow:hidden">` + string(svg) + `</body></html>`
-	err := chromedp.Run(browserCtx,
+	err := chromedp.Do(browserCtx,
 		chromedp.EmulateViewport(int64(o.Width), int64(o.Height), chromedp.EmulateScale(o.Scale)),
 		chromedp.Navigate("about:blank"),
-		chromedp.ActionFunc(func(ctx context.Context) error {
-			tree, err := page.GetFrameTree().Do(ctx)
+		chromedp.Func(func(ctx context.Context, t *chromedp.Target) error {
+			tree, err := cdp.Call(ctx, t, page.GetFrameTree, cdp.Empty{})
 			if err != nil {
 				return err
 			}
-			return page.SetDocumentContent(tree.Frame.ID, doc).Do(ctx)
+			_, err = cdp.Call(ctx, t, page.SetDocumentContent, page.SetDocumentContentParams{FrameID: tree.FrameTree.Frame.ID, HTML: doc})
+			return err
 		}),
 		chromedp.WaitReady("svg"),
 	)
@@ -84,15 +86,15 @@ func (s *Session) Close() { s.cancel() }
 
 // FrameAt pauses SMIL animation at t seconds and returns a screenshot.
 func (s *Session) FrameAt(t float64) (image.Image, error) {
-	var buf []byte
-	err := chromedp.Run(s.ctx,
-		chromedp.Evaluate(fmt.Sprintf(`(() => {
-			const s = document.querySelector('svg');
-			s.pauseAnimations(); s.setCurrentTime(%[1]g);                     // SMIL
-			document.getAnimations().forEach(a => { a.pause(); a.currentTime = %[1]g * 1000; }); // CSS
-		})()`, t), nil),
-		chromedp.CaptureScreenshot(&buf),
-	)
+	_, err := chromedp.Run(s.ctx, chromedp.Evaluate[chromedp.Void](fmt.Sprintf(`(() => {
+		const s = document.querySelector('svg');
+		s.pauseAnimations(); s.setCurrentTime(%[1]g);                     // SMIL
+		document.getAnimations().forEach(a => { a.pause(); a.currentTime = %[1]g * 1000; }); // CSS
+	})()`, t)))
+	if err != nil {
+		return nil, fmt.Errorf("export: pause at %.3fs: %w", t, err)
+	}
+	buf, err := chromedp.Run(s.ctx, chromedp.CaptureScreenshot())
 	if err != nil {
 		return nil, fmt.Errorf("export: capture at %.3fs: %w", t, err)
 	}
