@@ -88,6 +88,43 @@ have been the cheaper commit and the more expensive decision.
 | A code path with no test | Cover every path that reaches outside the process, such as a browser, with a test that skips when the tool is missing |
 | A format change that fails silently | A consumer that cannot read its input should say so and not produce nothing |
 
+## How the upstreams ship
+
+None of the three keeps maintenance branches or backports fixes to old versions.
+We read this from their public repositories (branches, tags, and release dates).
+We did not find a written policy, so this describes what they do and not what
+they have promised.
+
+| Module | Branches | Tags | Releases |
+|--------|----------|------|----------|
+| `chromedp` | `main`, and a stale `v0.1` branch from 2019 | 84, latest v0.21.0, none at v1 | v0.15.1 in the spring, then v0.19.0, v0.19.1, v0.20.0, v0.20.1 and v0.21.0 within about a week |
+| `cdproto` | `main` | 20, latest v0.159.0, none at v1 | Tagging starts at v0.157.0. Breaking changes ride minor and patch tags, such as v0.157.3 for the typed API and v0.157.4 for optional numbers as pointers |
+| `toon-go` | `main` | 4, latest v1.0.1 | v0.1.0, v0.2.0, v1.0.0 and v1.0.1 within about a week. The key-name change is in v1.0.1 and was not in the pre-release d2vision used before |
+| `kin-openapi` (for comparison, used in other projects of ours) | `master` | 156, latest v0.152.0, none at v1 | First release in 2018, still v0, and about ten minor releases a year since 2024 |
+
+Four things stand out:
+
+- **One line of development.** Every fix lands on `main`. A user of an old
+  version is expected to move forward. Nothing here backports.
+- **Versions that stay at v0.** cdproto is at v0.159.0 and kin-openapi at
+  v0.152.0, with no v1 tag. Semantic versioning reserves `0.y.z` for
+  development, where "anything may change at any time", so a long-lived v0 with
+  many minor releases says that each minor release is where breaking changes go
+  and that no stable v1 contract is promised. We do not know why these authors
+  stay at v0. Go's import path rule for v2 and above may be one reason, but that
+  is a guess.
+- **Releases come in bursts.** chromedp shipped five in a week and toon-go four.
+  A version you pin stops matching its neighbors quickly, and nobody will patch
+  it.
+- **Help to move.** chromedp ships `docs/MIGRATION.md`, which lists every renamed
+  and removed name in the order to apply them, and a `Legacy` adapter so old
+  code can move step by step. A project that breaks its users often can make the
+  move cheap, and this one did.
+
+So taking the change forward is not an outlier choice. It is how the ecosystem
+d2vision depends on already works. A consumer that expects stability from a v0
+module is relying on something its maintainers have not offered.
+
 ## Why this supports fix-forward
 
 The case is a fair test of the rule, because the changes were not small. Three
