@@ -380,6 +380,14 @@
       {
         "description": "`generate`: an edge between nodes in different containers (`a.x -> b.y`) now joins those nodes and no longer creates new top-level ones"
       }
+    ],
+    "changed": [
+      {
+        "description": "TOON output names each field by its json tag (`version`, `viewBox`, `nodes`), following toon-go v1.0, where it wrote Go field names (`Version`, `ViewBox`, `Nodes`). A `.toon` spec written with the old capitalized names generates nothing and must be renamed to lowercase"
+      },
+      {
+        "description": "Upgrade chromedp to v0.21.0 and cdproto to v0.159.0, and move PNG and GIF capture to chromedp's typed API"
+      }
     ]
   }
 }
