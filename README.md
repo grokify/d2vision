@@ -187,7 +187,7 @@ d2vision convert --lint-only diagram.mmd
 
 ### Card
 
-Render datasheet-style infographic cards from a JSON definition, with animated flow dots on edges. See [docs/commands/card.md](docs/commands/card.md).
+Render datasheet-style infographic cards from a JSON definition, with animated flow dots on edges. See [docs/guides/commands/card.md](docs/guides/commands/card.md).
 
 ```bash
 d2vision card render card.json --svg card.svg --png card.png --scale 2 --gif card.gif
@@ -195,7 +195,7 @@ d2vision card render card.json --svg card.svg --png card.png --scale 2 --gif car
 
 ### svg2gif
 
-Convert an animated SVG to a looping GIF. See [docs/commands/svg2gif.md](docs/commands/svg2gif.md).
+Convert an animated SVG to a looping GIF. See [docs/guides/commands/svg2gif.md](docs/guides/commands/svg2gif.md).
 
 ```bash
 d2vision svg2gif card.svg -o card.gif
@@ -254,7 +254,7 @@ Rules include `corner-near` (corner-pinned elements → wasted whitespace),
 missing `grid-columns`, inconsistent directions, deep nesting, and duplicate
 nodes. A `.d2vision.yaml` config enables/disables rules, overrides severities,
 and sets per-rule options, so one invocation runs the whole policy. See
-[docs/lint-rules.md](docs/lint-rules.md).
+[docs/guides/lint-rules.md](docs/guides/lint-rules.md).
 
 ### Review
 
@@ -615,7 +615,7 @@ authored diagrams and for a reproducible build; for genuine large-scale cluster
 discovery, use them as a separate tool (Graphviz `sfdp`, Gephi, Cytoscape), not
 a D2 layout engine. Rule of thumb: **Dagre by default, ELK when a diagram has
 multiple edges between the same nodes.** See
-[Cookbook → Layout Engines](docs/cookbook/layout-engines.md) for the full
+[Cookbook → Layout Engines](docs/guides/cookbook/layout-engines.md) for the full
 discussion.
 
 ## Supported Features

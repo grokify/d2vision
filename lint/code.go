@@ -73,7 +73,7 @@ Each stacks the element cleanly above, below, left, or right of the diagram so
 the two share an axis. Choose the edge on the diagram's short axis to minimize
 whitespace: a tall (top-down) flow -> center-left/center-right; a wide flow ->
 top-center/bottom-center.`,
-		DocURL: "docs/lint-rules.md#corner-near",
+		DocURL: "docs/guides/lint-rules.md#corner-near",
 	},
 	CodeTextOverlap: {
 		Code:       CodeTextOverlap,
@@ -94,7 +94,7 @@ Fix, in order of preference:
 
 Because it requires a full layout pass, this rule is engine-specific and is
 opt-in via config (rules.text-overlap.enabled: true, settings.layout: elk).`,
-		DocURL: "docs/lint-rules.md#text-overlap",
+		DocURL: "docs/guides/lint-rules.md#text-overlap",
 	},
 	CodeCrossContainerEdge: {
 		Code:        CodeCrossContainerEdge,
@@ -102,7 +102,7 @@ opt-in via config (rules.text-overlap.enabled: true, settings.layout: elk).`,
 		Title:       "Cross-container edge",
 		Suggestion:  "add 'grid-columns: N' at root level to control horizontal layout",
 		Remediation: "An edge between different top-level containers can force the layout engine to stack them vertically. Add `grid-columns: N` at the root to control the arrangement, or reconsider whether the edge should cross the boundary.",
-		DocURL:      "docs/lint-rules.md#cross-container-edge",
+		DocURL:      "docs/guides/lint-rules.md#cross-container-edge",
 	},
 	CodeDuplicateNode: {
 		Code:        CodeDuplicateNode,
@@ -110,7 +110,7 @@ opt-in via config (rules.text-overlap.enabled: true, settings.layout: elk).`,
 		Title:       "Duplicate node definition",
 		Suggestion:  "consolidate the node's definitions into one",
 		Remediation: "A node id is defined more than once. Later definitions merge into the first, which is easy to do by accident. Consolidate the attributes into a single definition.",
-		DocURL:      "docs/lint-rules.md#duplicate-node",
+		DocURL:      "docs/guides/lint-rules.md#duplicate-node",
 	},
 	CodeDeepNesting: {
 		Code:        CodeDeepNesting,
@@ -118,7 +118,7 @@ opt-in via config (rules.text-overlap.enabled: true, settings.layout: elk).`,
 		Title:       "Deep container nesting",
 		Suggestion:  "flatten the structure if possible",
 		Remediation: "Container nesting deeper than ~3 levels can slow layout and make the diagram hard to read. Flatten the hierarchy or split the diagram.",
-		DocURL:      "docs/lint-rules.md#deep-nesting",
+		DocURL:      "docs/guides/lint-rules.md#deep-nesting",
 	},
 	CodeMissingGrid: {
 		Code:        CodeMissingGrid,
@@ -126,7 +126,7 @@ opt-in via config (rules.text-overlap.enabled: true, settings.layout: elk).`,
 		Title:       "Multiple root containers without a grid",
 		Suggestion:  "add 'grid-columns: N' to control horizontal arrangement",
 		Remediation: "Several root-level containers with no `grid-columns` leave their arrangement to the layout engine, which often stacks them. Add `grid-columns: N` at the root to place them deliberately.",
-		DocURL:      "docs/lint-rules.md#missing-grid",
+		DocURL:      "docs/guides/lint-rules.md#missing-grid",
 	},
 	CodeMixedDirections: {
 		Code:        CodeMixedDirections,
@@ -134,7 +134,7 @@ opt-in via config (rules.text-overlap.enabled: true, settings.layout: elk).`,
 		Title:       "Mixed direction settings",
 		Suggestion:  "use consistent directions for a cleaner layout",
 		Remediation: "Different `direction` values across the graph can produce an inconsistent flow. Prefer one direction unless a sub-graph genuinely needs its own.",
-		DocURL:      "docs/lint-rules.md#mixed-directions",
+		DocURL:      "docs/guides/lint-rules.md#mixed-directions",
 	},
 	CodeCompileSkipped: {
 		Code:        CodeCompileSkipped,
@@ -142,7 +142,7 @@ opt-in via config (rules.text-overlap.enabled: true, settings.layout: elk).`,
 		Title:       "Structural checks skipped",
 		Suggestion:  "fix the D2 compile error so graph-based checks can run",
 		Remediation: "The D2 did not compile, so graph-based (structural) checks were skipped; only the text-based checks ran. Fix the reported compile error and re-lint.",
-		DocURL:      "docs/lint-rules.md#compile-skipped",
+		DocURL:      "docs/guides/lint-rules.md#compile-skipped",
 	},
 }
 

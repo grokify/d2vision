@@ -40,49 +40,49 @@ markdown_extensions:
 
 nav:
   - Home: index.md
-  - Getting Started: getting-started.md
+  - Getting Started: guides/getting-started.md
   - Commands:
-      - Overview: commands/index.md
-      - parse: commands/parse.md
-      - generate: commands/generate.md
-      - template: commands/template.md
-      - pipeline: commands/pipeline.md
-      - convert: commands/convert.md
-      - learn: commands/learn.md
-      - lint: commands/lint.md
-      - diff: commands/diff.md
-      - watch: commands/watch.md
-      - analyze: commands/analyze.md
-      - review: commands/review.md
-      - compact: commands/compact.md
-      - icons: commands/icons.md
-      - rotate: commands/rotate.md
-      - card: commands/card.md
-      - svg2gif: commands/svg2gif.md
+      - Overview: guides/commands/index.md
+      - parse: guides/commands/parse.md
+      - generate: guides/commands/generate.md
+      - template: guides/commands/template.md
+      - pipeline: guides/commands/pipeline.md
+      - convert: guides/commands/convert.md
+      - learn: guides/commands/learn.md
+      - lint: guides/commands/lint.md
+      - diff: guides/commands/diff.md
+      - watch: guides/commands/watch.md
+      - analyze: guides/commands/analyze.md
+      - review: guides/commands/review.md
+      - compact: guides/commands/compact.md
+      - icons: guides/commands/icons.md
+      - rotate: guides/commands/rotate.md
+      - card: guides/commands/card.md
+      - svg2gif: guides/commands/svg2gif.md
   - Cookbook:
-      - Overview: cookbook/index.md
-      - Layout Fundamentals: cookbook/layout-fundamentals.md
-      - Layout Engines: cookbook/layout-engines.md
-      - Side-by-Side Layouts: cookbook/side-by-side.md
-      - Container Patterns: cookbook/containers.md
-      - Cross-Container Edges: cookbook/cross-container-edges.md
-      - Sequence Diagrams: cookbook/sequence-diagrams.md
-      - SQL Tables: cookbook/sql-tables.md
-      - Styling: cookbook/styling.md
-      - Pipeline Use Cases: cookbook/pipeline-use-cases.md
+      - Overview: guides/cookbook/index.md
+      - Layout Fundamentals: guides/cookbook/layout-fundamentals.md
+      - Layout Engines: guides/cookbook/layout-engines.md
+      - Side-by-Side Layouts: guides/cookbook/side-by-side.md
+      - Container Patterns: guides/cookbook/containers.md
+      - Cross-Container Edges: guides/cookbook/cross-container-edges.md
+      - Sequence Diagrams: guides/cookbook/sequence-diagrams.md
+      - SQL Tables: guides/cookbook/sql-tables.md
+      - Styling: guides/cookbook/styling.md
+      - Pipeline Use Cases: guides/cookbook/pipeline-use-cases.md
   - Examples:
-      - Overview: examples/index.md
+      - Overview: guides/examples/index.md
   - Case Studies:
-      - Overview: case-studies/index.md
-      - Fixing Forward Through Three Breaking Upgrades: case-studies/fix-forward-chromedp-cdproto-toon.md
+      - Overview: design/case-studies/index.md
+      - Fixing Forward Through Three Breaking Upgrades: design/case-studies/fix-forward-chromedp-cdproto-toon.md
   - Releases:
       - Overview: releases/index.md
       - v0.3.0: releases/v0.3.0.md
       - v0.2.0: releases/v0.2.0.md
       - v0.1.0: releases/v0.1.0.md
-  - Lint Rules: lint-rules.md
-  - API Reference: api-reference.md
-  - Troubleshooting: troubleshooting.md
+  - Lint Rules: guides/lint-rules.md
+  - API Reference: guides/api-reference.md
+  - Troubleshooting: guides/troubleshooting.md
 
 extra:
   social:
