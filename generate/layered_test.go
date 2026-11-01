@@ -16,8 +16,10 @@ import (
 // classes. Its labels hold the characters D2 reads as syntax.
 func layered() *generate.DiagramSpec {
 	return &generate.DiagramSpec{
-		Direction:   "right",
-		GridColumns: 2,
+		Direction:     "right",
+		GridColumns:   2,
+		HorizontalGap: 90,
+		VerticalGap:   24,
 		Classes: map[string]generate.StyleSpec{
 			"input":  {Fill: "#fff1dc", Stroke: "#e08a1e", BorderRadius: generate.IntPtr(12)},
 			"result": {Fill: "#e1f3fd", Stroke: "#2d9cdb", Bold: generate.BoolPtr(true), FontColor: "#111111"},
@@ -67,6 +69,15 @@ func TestLayeredSpecCompilesAsD2(t *testing.T) {
 }
 
 // A label is shown as written, whatever characters it holds.
+func TestGridGapsAreWritten(t *testing.T) {
+	code := generate.NewGenerator().Generate(layered())
+	for _, want := range []string{"horizontal-gap: 90", "vertical-gap: 24"} {
+		if !strings.Contains(code, want) {
+			t.Errorf("missing %q:\n%s", want, code)
+		}
+	}
+}
+
 func TestLabelsReachTheDiagramUnchanged(t *testing.T) {
 	code := generate.NewGenerator().Generate(layered())
 	d, err := render.Compile(context.Background(), code)
