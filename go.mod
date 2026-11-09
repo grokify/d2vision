@@ -4,7 +4,7 @@ go 1.26.0
 
 require (
 	github.com/chromedp/cdproto v0.159.0
-	github.com/chromedp/chromedp v0.21.0
+	github.com/chromedp/chromedp v0.23.0
 	github.com/fsnotify/fsnotify v1.10.1
 	github.com/spf13/cobra v1.10.2
 	github.com/toon-format/toon-go v1.0.1
