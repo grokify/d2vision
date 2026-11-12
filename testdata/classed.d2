@@ -1,0 +1,10 @@
+# Rendered with d2 v0.7.1 to classed.svg: D2 writes each element's classes
+# after its base64 ID, and a label with a line break as one tspan per line.
+classes: {
+  item: {style.font-size: 20}
+}
+stage: {
+  a: "First line here\nsecond line" {class: item}
+}
+b: Plain
+stage.a -> b

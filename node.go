@@ -12,13 +12,15 @@ type NodeStyle struct {
 
 // Node represents a node (shape) in a D2 diagram.
 type Node struct {
-	ID       string    `json:"id"`
-	Label    string    `json:"label,omitempty"`
-	Shape    ShapeType `json:"shape"`
-	Bounds   Bounds    `json:"bounds"`
-	Parent   string    `json:"parent,omitempty"`
-	Children []string  `json:"children,omitempty"`
-	Style    NodeStyle `json:"style,omitzero"`
+	ID    string `json:"id"`
+	Label string `json:"label,omitempty"`
+	// LabelLines holds the label's lines when it has more than one.
+	LabelLines []string  `json:"labelLines,omitempty"`
+	Shape      ShapeType `json:"shape"`
+	Bounds     Bounds    `json:"bounds"`
+	Parent     string    `json:"parent,omitempty"`
+	Children   []string  `json:"children,omitempty"`
+	Style      NodeStyle `json:"style,omitzero"`
 }
 
 // HasChildren returns true if the node has child nodes.

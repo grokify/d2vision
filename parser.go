@@ -96,8 +96,8 @@ type svgRoot struct {
 // contains the <g> groups for nodes and edges. Without parsing this nested
 // structure, we would miss the actual diagram elements and their bounds.
 type svgNested struct {
-	ViewBox  string      `xml:"viewBox,attr"`
-	Children []svgGroup  `xml:"g"`
+	ViewBox  string     `xml:"viewBox,attr"`
+	Children []svgGroup `xml:"g"`
 }
 
 type svgDefs struct {
@@ -160,6 +160,7 @@ type svgPath struct {
 type svgText struct {
 	X       string     `xml:"x,attr"`
 	Y       string     `xml:"y,attr"`
+	Style   string     `xml:"style,attr"`
 	Content string     `xml:",chardata"`
 	TSpans  []svgTSpan `xml:"tspan"`
 }
@@ -226,8 +227,9 @@ func (p *Parser) processGroup(g svgGroup, diagram *Diagram, nodeMap map[string]*
 		return
 	}
 
-	// Attempt to decode the class as a base64-encoded D2 ID
-	decodedID, err := DecodeBase64ID(g.Class)
+	// Attempt to decode the class as a base64-encoded D2 ID. D2 writes the
+	// element's own classes after the ID, as in class="YQ== stage".
+	decodedID, err := DecodeBase64ID(idClass(g.Class))
 	if err != nil {
 		// Not a base64 class - could be a regular CSS class like "shape"
 		return
@@ -260,6 +262,9 @@ func (p *Parser) parseNode(id string, g svgGroup) *Node {
 
 	// Extract label from <text> elements
 	node.Label = p.extractLabel(g)
+	if lines := labelLines(g); len(lines) > 1 {
+		node.LabelLines = lines
+	}
 
 	// Detect shape from SVG primitives (rect, circle, ellipse, path)
 	node.Shape = p.detectShape(g)
@@ -788,6 +793,18 @@ func (p *Parser) extractNodeStyle(g svgGroup) NodeStyle {
 		rect := g.Rects[0]
 		style.Fill = rect.Fill
 		style.Stroke = rect.Stroke
+	} else {
+		// D2 nests a node's shape in <g class="shape">.
+		for _, child := range g.Children {
+			if child.Class == "shape" && len(child.Rects) > 0 {
+				style.Fill = child.Rects[0].Fill
+				style.Stroke = child.Rects[0].Stroke
+				break
+			}
+		}
+	}
+	if len(g.Texts) > 0 {
+		style.FontSize = fontSize(g.Texts[0].Style)
 	}
 
 	return style
@@ -844,11 +861,12 @@ func (p *Parser) buildHierarchy(diagram *Diagram) {
 // processInnerXML scans raw XML for any base64-encoded classes we might have
 // missed during structured parsing. This is a fallback mechanism.
 func (p *Parser) processInnerXML(innerXML string, diagram *Diagram, nodeMap map[string]*Node, edgeMap map[string]*Edge) {
-	classPattern := regexp.MustCompile(`class="([^"]+)"`)
+	// Only groups carry element IDs; a <text class="text ..."> would decode.
+	classPattern := regexp.MustCompile(`<g class="([^"]+)"`)
 	matches := classPattern.FindAllStringSubmatch(innerXML, -1)
 
 	for _, match := range matches {
-		className := match[1]
+		className := idClass(match[1])
 
 		// Skip non-base64 classes
 		if !mightBeBase64(className) {
@@ -905,4 +923,48 @@ func mightBeBase64(s string) bool {
 		}
 	}
 	return true
+}
+
+// idClass returns the first name in a class attribute, where D2 writes the
+// base64 element ID ahead of the element's own classes.
+func idClass(class string) string {
+	if f := strings.Fields(class); len(f) > 0 {
+		return f[0]
+	}
+	return ""
+}
+
+// labelLines returns the lines of a node's own label: D2 writes a label with
+// line breaks as one <text> with a <tspan> per line.
+func labelLines(g svgGroup) []string {
+	if len(g.Texts) == 0 {
+		return nil
+	}
+	t := g.Texts[0]
+	var lines []string
+	for _, ts := range t.TSpans {
+		lines = append(lines, html.UnescapeString(strings.TrimSpace(ts.Content)))
+	}
+	if len(lines) == 0 {
+		if c := strings.TrimSpace(t.Content); c != "" {
+			lines = []string{html.UnescapeString(c)}
+		}
+	}
+	return lines
+}
+
+// fontSize reads font-size in pixels from an inline style such as
+// "text-anchor:middle;font-size:16px". It returns 0 when there is none.
+func fontSize(style string) float64 {
+	for _, decl := range strings.Split(style, ";") {
+		k, v, ok := strings.Cut(decl, ":")
+		if !ok || strings.TrimSpace(k) != "font-size" {
+			continue
+		}
+		v = strings.TrimSuffix(strings.TrimSpace(v), "px")
+		if f, err := strconv.ParseFloat(v, 64); err == nil {
+			return f
+		}
+	}
+	return 0
 }
