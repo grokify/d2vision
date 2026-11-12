@@ -159,7 +159,9 @@ tables:
 
 A label is shown as written, whatever it holds. Text with characters D2 reads as
 syntax (`:`, `;`, `{`, `}`, `#`, `$`, quotes) is written in single quotes, so it
-compiles and appears unchanged. A line break in a label becomes a space.
+compiles and appears unchanged. A label with line breaks keeps them: it is
+written in double quotes with each break as `\n`, so a long label wrapped with
+`legibility.Wrap` makes a taller, narrower box. Mermaid shows a break as `<br/>`.
 
 ### Reserved words as names
 
@@ -180,7 +182,14 @@ container. A node ID that itself contains a dot cannot be named by an edge.
 
 `classes` names a style once, and a node, container, or edge uses it with
 `class`. Classes are written in name order, so the same spec always gives the
-same D2.
+same D2. A class's `width` and `height` fix the size of every shape that uses
+it, so boxes line up in columns; wrap long labels to suit the width.
+
+### Layout engine
+
+`layoutEngine` names the D2 layout engine, written into the diagram's
+`d2-config`, so `d2` uses it unless told otherwise. Use `elk` when arrows must
+go around boxes: a grid draws them straight, over whatever is in the way.
 
 ### Grid spacing
 

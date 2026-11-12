@@ -36,6 +36,7 @@ d2vision provides a complete toolkit for working with D2 diagrams:
 - ↔️ **Diff**: Compare two diagrams
 - 👁️ **Watch**: Auto-render D2 files on changes
 - 📊 **Analyze**: Analyze layout and provide generation hints
+- 🔎 **Legibility**: Check that labels can be read on a page, slide, or screen
 - 🎨 **Icons**: Browse and search D2's icon library
 - 🔄 **Pipeline**: Generate workflow diagrams from PipelineSpec
 - 🔀 **Convert**: Convert Mermaid/PlantUML diagrams to D2
@@ -356,6 +357,24 @@ Provides:
 - Cross-container edge detection
 - Insights about what makes the layout work
 - Hints for recreating the diagram in D2
+
+### Legibility
+
+Check whether a diagram's labels can be read where it is shown. The diagram is
+scaled to fit each target, and every label is measured at the size it is shown.
+
+```bash
+# Check every target: Word portrait and landscape, tabloid, a 16:9 slide, a screen
+d2vision legibility diagram.svg
+
+# Check one target, and exit with status 1 if a label is too small
+d2vision legibility diagram.svg --target docx-portrait --check
+```
+
+For a diagram that is not readable, it says how many times too large it is and
+what would help: wrapping labels, fewer columns or rows, a larger font,
+splitting it, or a target it already fits. See the
+[legibility guide](docs/guides/commands/legibility.md).
 
 ### Icons
 

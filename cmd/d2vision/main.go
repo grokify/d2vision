@@ -72,6 +72,7 @@ func init() {
 	rootCmd.AddCommand(diffCmd)
 	rootCmd.AddCommand(watchCmd)
 	rootCmd.AddCommand(analyzeCmd)
+	rootCmd.AddCommand(legibilityCmd)
 	rootCmd.AddCommand(iconsCmd)
 	rootCmd.AddCommand(convertCmd)
 	rootCmd.AddCommand(pipelineCmd)

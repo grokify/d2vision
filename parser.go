@@ -96,8 +96,8 @@ type svgRoot struct {
 // contains the <g> groups for nodes and edges. Without parsing this nested
 // structure, we would miss the actual diagram elements and their bounds.
 type svgNested struct {
-	ViewBox  string      `xml:"viewBox,attr"`
-	Children []svgGroup  `xml:"g"`
+	ViewBox  string     `xml:"viewBox,attr"`
+	Children []svgGroup `xml:"g"`
 }
 
 type svgDefs struct {
@@ -160,6 +160,7 @@ type svgPath struct {
 type svgText struct {
 	X       string     `xml:"x,attr"`
 	Y       string     `xml:"y,attr"`
+	Style   string     `xml:"style,attr"`
 	Content string     `xml:",chardata"`
 	TSpans  []svgTSpan `xml:"tspan"`
 }
@@ -226,8 +227,9 @@ func (p *Parser) processGroup(g svgGroup, diagram *Diagram, nodeMap map[string]*
 		return
 	}
 
-	// Attempt to decode the class as a base64-encoded D2 ID
-	decodedID, err := DecodeBase64ID(g.Class)
+	// Attempt to decode the class as a base64-encoded D2 ID. D2 writes the
+	// element's own classes after the ID, as in class="YQ== stage".
+	decodedID, err := DecodeBase64ID(idClass(g.Class))
 	if err != nil {
 		// Not a base64 class - could be a regular CSS class like "shape"
 		return
@@ -260,6 +262,9 @@ func (p *Parser) parseNode(id string, g svgGroup) *Node {
 
 	// Extract label from <text> elements
 	node.Label = p.extractLabel(g)
+	if lines := labelLines(g); len(lines) > 1 {
+		node.LabelLines = lines
+	}
 
 	// Detect shape from SVG primitives (rect, circle, ellipse, path)
 	node.Shape = p.detectShape(g)
@@ -761,24 +766,122 @@ func (p *Parser) extractPath(g svgGroup) []Point {
 	return nil
 }
 
-// parseSVGPath parses an SVG path d attribute into coordinate points.
-// This is a simplified parser that handles M (moveto) and L (lineto) commands.
+// parseSVGPath parses an SVG path d attribute into points along the path. It
+// reads the absolute commands D2 writes: M and L, H and V, cubic curves C and
+// S, and quadratic curves Q and T, with a curve sampled at several points so
+// the points follow its shape. Z and relative commands are ignored.
 func parseSVGPath(d string) []Point {
+	tokens := pathTokenPattern.FindAllString(d, -1)
 	var points []Point
-
-	coordPattern := regexp.MustCompile(`[ML]\s*([-\d.]+)[,\s]+([-\d.]+)`)
-	matches := coordPattern.FindAllStringSubmatch(d, -1)
-
-	for _, match := range matches {
-		x, err1 := strconv.ParseFloat(match[1], 64)
-		y, err2 := strconv.ParseFloat(match[2], 64)
-		if err1 == nil && err2 == nil {
-			points = append(points, Point{X: x, Y: y})
+	var cur, ctrl Point
+	cmd := ""
+	num := func(i int) (float64, bool) {
+		if i >= len(tokens) {
+			return 0, false
+		}
+		f, err := strconv.ParseFloat(tokens[i], 64)
+		return f, err == nil
+	}
+	nums := func(i, n int) ([]float64, bool) {
+		out := make([]float64, n)
+		for k := range n {
+			f, ok := num(i + k)
+			if !ok {
+				return nil, false
+			}
+			out[k] = f
+		}
+		return out, true
+	}
+	cubic := func(p1, p2, p3 Point) {
+		p0 := cur
+		for k := 1; k <= curveSamples; k++ {
+			t := float64(k) / curveSamples
+			u := 1 - t
+			points = append(points, Point{
+				X: u*u*u*p0.X + 3*u*u*t*p1.X + 3*u*t*t*p2.X + t*t*t*p3.X,
+				Y: u*u*u*p0.Y + 3*u*u*t*p1.Y + 3*u*t*t*p2.Y + t*t*t*p3.Y,
+			})
+		}
+		cur, ctrl = p3, p2
+	}
+	for i := 0; i < len(tokens); {
+		if c := tokens[i]; len(c) == 1 && strings.Contains("MLHVCSQTZmlhvcsqtz", c) {
+			cmd = c
+			i++
+			continue
+		}
+		switch cmd {
+		case "M", "L":
+			v, ok := nums(i, 2)
+			if !ok {
+				return points
+			}
+			cur = Point{X: v[0], Y: v[1]}
+			ctrl = cur
+			points = append(points, cur)
+			i += 2
+		case "H", "V":
+			v, ok := nums(i, 1)
+			if !ok {
+				return points
+			}
+			if cmd == "H" {
+				cur.X = v[0]
+			} else {
+				cur.Y = v[0]
+			}
+			ctrl = cur
+			points = append(points, cur)
+			i++
+		case "C":
+			v, ok := nums(i, 6)
+			if !ok {
+				return points
+			}
+			cubic(Point{X: v[0], Y: v[1]}, Point{X: v[2], Y: v[3]}, Point{X: v[4], Y: v[5]})
+			i += 6
+		case "S":
+			v, ok := nums(i, 4)
+			if !ok {
+				return points
+			}
+			p1 := Point{X: 2*cur.X - ctrl.X, Y: 2*cur.Y - ctrl.Y}
+			cubic(p1, Point{X: v[0], Y: v[1]}, Point{X: v[2], Y: v[3]})
+			i += 4
+		case "Q":
+			v, ok := nums(i, 4)
+			if !ok {
+				return points
+			}
+			q := Point{X: v[0], Y: v[1]}
+			end := Point{X: v[2], Y: v[3]}
+			cubic(Point{X: cur.X + 2.0/3*(q.X-cur.X), Y: cur.Y + 2.0/3*(q.Y-cur.Y)},
+				Point{X: end.X + 2.0/3*(q.X-end.X), Y: end.Y + 2.0/3*(q.Y-end.Y)}, end)
+			ctrl = q
+			i += 4
+		case "T":
+			v, ok := nums(i, 2)
+			if !ok {
+				return points
+			}
+			cur = Point{X: v[0], Y: v[1]}
+			ctrl = cur
+			points = append(points, cur)
+			i += 2
+		default:
+			// Z, a relative command, or a number with no command.
+			i++
 		}
 	}
-
 	return points
 }
+
+// curveSamples is how many points a curve is sampled at.
+const curveSamples = 8
+
+// pathTokenPattern splits a path into commands and numbers.
+var pathTokenPattern = regexp.MustCompile(`[A-Za-z]|-?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?`)
 
 // extractNodeStyle extracts visual styling from a node's SVG elements.
 func (p *Parser) extractNodeStyle(g svgGroup) NodeStyle {
@@ -788,6 +891,18 @@ func (p *Parser) extractNodeStyle(g svgGroup) NodeStyle {
 		rect := g.Rects[0]
 		style.Fill = rect.Fill
 		style.Stroke = rect.Stroke
+	} else {
+		// D2 nests a node's shape in <g class="shape">.
+		for _, child := range g.Children {
+			if child.Class == "shape" && len(child.Rects) > 0 {
+				style.Fill = child.Rects[0].Fill
+				style.Stroke = child.Rects[0].Stroke
+				break
+			}
+		}
+	}
+	if len(g.Texts) > 0 {
+		style.FontSize = fontSize(g.Texts[0].Style)
 	}
 
 	return style
@@ -844,11 +959,12 @@ func (p *Parser) buildHierarchy(diagram *Diagram) {
 // processInnerXML scans raw XML for any base64-encoded classes we might have
 // missed during structured parsing. This is a fallback mechanism.
 func (p *Parser) processInnerXML(innerXML string, diagram *Diagram, nodeMap map[string]*Node, edgeMap map[string]*Edge) {
-	classPattern := regexp.MustCompile(`class="([^"]+)"`)
+	// Only groups carry element IDs; a <text class="text ..."> would decode.
+	classPattern := regexp.MustCompile(`<g class="([^"]+)"`)
 	matches := classPattern.FindAllStringSubmatch(innerXML, -1)
 
 	for _, match := range matches {
-		className := match[1]
+		className := idClass(match[1])
 
 		// Skip non-base64 classes
 		if !mightBeBase64(className) {
@@ -905,4 +1021,48 @@ func mightBeBase64(s string) bool {
 		}
 	}
 	return true
+}
+
+// idClass returns the first name in a class attribute, where D2 writes the
+// base64 element ID ahead of the element's own classes.
+func idClass(class string) string {
+	if f := strings.Fields(class); len(f) > 0 {
+		return f[0]
+	}
+	return ""
+}
+
+// labelLines returns the lines of a node's own label: D2 writes a label with
+// line breaks as one <text> with a <tspan> per line.
+func labelLines(g svgGroup) []string {
+	if len(g.Texts) == 0 {
+		return nil
+	}
+	t := g.Texts[0]
+	var lines []string
+	for _, ts := range t.TSpans {
+		lines = append(lines, html.UnescapeString(strings.TrimSpace(ts.Content)))
+	}
+	if len(lines) == 0 {
+		if c := strings.TrimSpace(t.Content); c != "" {
+			lines = []string{html.UnescapeString(c)}
+		}
+	}
+	return lines
+}
+
+// fontSize reads font-size in pixels from an inline style such as
+// "text-anchor:middle;font-size:16px". It returns 0 when there is none.
+func fontSize(style string) float64 {
+	for _, decl := range strings.Split(style, ";") {
+		k, v, ok := strings.Cut(decl, ":")
+		if !ok || strings.TrimSpace(k) != "font-size" {
+			continue
+		}
+		v = strings.TrimSuffix(strings.TrimSpace(v), "px")
+		if f, err := strconv.ParseFloat(v, 64); err == nil {
+			return f
+		}
+	}
+	return 0
 }
