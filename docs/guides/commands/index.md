@@ -16,6 +16,7 @@ d2vision provides commands for working with D2 diagrams.
 | [diff](diff.md) | Compare two diagrams |
 | [watch](watch.md) | Auto-render D2 files on changes |
 | [analyze](analyze.md) | Analyze layout and provide generation hints |
+| [legibility](legibility.md) | Check that labels can be read on a page, slide, or screen |
 | [icons](icons.md) | Browse and search D2's icon library |
 | [rotate](rotate.md) | Rotate SVG by 90° increments |
 | [card](card.md) | Render datasheet-style infographic cards (SVG, PNG, animated GIF) |

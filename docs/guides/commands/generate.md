@@ -159,7 +159,9 @@ tables:
 
 A label is shown as written, whatever it holds. Text with characters D2 reads as
 syntax (`:`, `;`, `{`, `}`, `#`, `$`, quotes) is written in single quotes, so it
-compiles and appears unchanged. A line break in a label becomes a space.
+compiles and appears unchanged. A label with line breaks keeps them: it is
+written in double quotes with each break as `\n`, so a long label wrapped with
+`legibility.Wrap` makes a taller, narrower box. Mermaid shows a break as `<br/>`.
 
 ### Reserved words as names
 

@@ -93,6 +93,7 @@ nav:
       - diff: guides/commands/diff.md
       - watch: guides/commands/watch.md
       - analyze: guides/commands/analyze.md
+      - legibility: guides/commands/legibility.md
       - review: guides/commands/review.md
       - compact: guides/commands/compact.md
       - icons: guides/commands/icons.md

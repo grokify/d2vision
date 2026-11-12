@@ -8,6 +8,48 @@
     "grokify",
     "johncwang@gmail.com"
   ],
+  "unreleased": {
+    "highlights": [
+      {
+        "description": "`d2vision legibility` and the `legibility` package check whether a diagram's labels can be read on a Word page, a slide, or a screen, and say what would make them readable"
+      }
+    ],
+    "added": [
+      {
+        "description": "`legibility`: `Analyze` fits a parsed diagram to a target, keeping its shape, and reports each label's size as shown, the labels below the target's minimum, the largest readable size, and advice; built-in targets for Word portrait and landscape, tabloid, a 16:9 slide, and a browser window; `Wrap` breaks a label into lines",
+        "commit": "bbf7f57"
+      },
+      {
+        "description": "`d2vision legibility`: check every built-in target, chosen ones, or a custom area, as text, JSON, or TOON, with `--check` to fail when a label is too small",
+        "commit": "c0b258e"
+      },
+      {
+        "description": "Parsed nodes carry their label's font size in `Style.FontSize`, the fill and stroke of a nested shape, and `LabelLines` for a label on more than one line",
+        "commit": "843bd63"
+      }
+    ],
+    "changed": [
+      {
+        "description": "`generate` keeps line breaks in labels: D2 gets a double-quoted string with `\\n`, and Mermaid `<br/>`. Labels on one line are written as before",
+        "commit": "ad601c6"
+      }
+    ],
+    "fixed": [
+      {
+        "description": "The parser reads diagrams whose elements have classes, where D2 writes the classes after the base64 ID; such a diagram parsed with no nodes or edges",
+        "commit": "843bd63"
+      },
+      {
+        "description": "`learn` no longer fails on a parsed node with a fill or stroke",
+        "commit": "e55fa56"
+      }
+    ],
+    "documentation": [
+      {
+        "description": "A legibility guide, and the generate guide on line breaks in labels"
+      }
+    ]
+  },
   "releases": [
     {
       "version": "v0.5.0",
