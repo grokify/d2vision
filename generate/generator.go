@@ -21,6 +21,11 @@ func NewGenerator() *Generator {
 func (g *Generator) Generate(spec *DiagramSpec) string {
 	var b strings.Builder
 
+	if spec.LayoutEngine != "" {
+		fmt.Fprintf(&b, "vars: {\n%sd2-config: {\n%s%slayout-engine: %s\n%s}\n}\n\n",
+			g.indent, g.indent, g.indent, g.escapeID(spec.LayoutEngine), g.indent)
+	}
+
 	// Root-level layout settings
 	if spec.GridColumns > 0 {
 		fmt.Fprintf(&b, "grid-columns: %d\n", spec.GridColumns)
@@ -241,6 +246,12 @@ func (g *Generator) generateStyle(b *strings.Builder, s *StyleSpec, depth int) {
 	if s.Bold != nil {
 		fmt.Fprintf(b, "%sstyle.bold: %t\n", indent, *s.Bold)
 	}
+	if s.Width != nil && *s.Width > 0 {
+		fmt.Fprintf(b, "%swidth: %d\n", indent, *s.Width)
+	}
+	if s.Height != nil && *s.Height > 0 {
+		fmt.Fprintf(b, "%sheight: %d\n", indent, *s.Height)
+	}
 }
 
 func (g *Generator) isEmptyStyle(s *StyleSpec) bool {
@@ -248,7 +259,8 @@ func (g *Generator) isEmptyStyle(s *StyleSpec) bool {
 		return true
 	}
 	return s.Fill == "" && s.Stroke == "" && s.StrokeWidth == nil &&
-		s.BorderRadius == nil && s.FontSize == nil && s.Opacity == nil && s.FontColor == "" && s.Bold == nil
+		s.BorderRadius == nil && s.FontSize == nil && s.Opacity == nil && s.FontColor == "" && s.Bold == nil &&
+		s.Width == nil && s.Height == nil
 }
 
 // reservedKeywords are the words D2 reads as settings and not as names. An ID
