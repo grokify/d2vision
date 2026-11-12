@@ -4,6 +4,7 @@ Release notes for d2vision versions.
 
 ## Releases
 
+- [v0.6.0](v0.6.0.md) - 2026-11-12 - Legibility checks for pages, slides, and screens; wrapped labels, box sizes, and the layout engine in generate; classed diagrams parse
 - [v0.5.0](v0.5.0.md) - 2026-11-01 - Mermaid on the command line, reserved words quoted as IDs, redirects for the moved pages
 - [v0.4.0](v0.4.0.md) - 2026-11-01 - Safe labels and container edges in generate, classes, grid gaps, Mermaid output, chromedp and TOON upgrades, standard docs layout
 - [v0.3.0](v0.3.0.md) - 2026-09-28 - Infographic cards with animated flow dots, protocol-backed panels, svg2gif

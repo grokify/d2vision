@@ -8,61 +8,96 @@
     "grokify",
     "johncwang@gmail.com"
   ],
-  "unreleased": {
-    "highlights": [
-      {
-        "description": "`d2vision legibility` and the `legibility` package check whether a diagram's labels can be read on a Word page, a slide, or a screen, and find arrows drawn over boxes, and say what would fix both"
-      }
-    ],
-    "added": [
-      {
-        "description": "`legibility`: `Analyze` fits a parsed diagram to a target, keeping its shape, and reports each label's size as shown, the labels below the target's minimum, the largest readable size, and advice; built-in targets for Word portrait and landscape, tabloid, a 16:9 slide, and a browser window; `Wrap` breaks a label into lines",
-        "commit": "bbf7f57"
-      },
-      {
-        "description": "`d2vision legibility`: check every built-in target, chosen ones, or a custom area, as text, JSON, or TOON, with `--check` to fail when a label is too small",
-        "commit": "c0b258e"
-      },
-      {
-        "description": "`legibility.Crossings` lists arrows drawn over boxes they do not join; reports carry them, `Report.Clear` is false when there are any, and `d2vision legibility --check` fails on them",
-        "commit": "7a5f454"
-      },
-      {
-        "description": "Parsed nodes carry their label's font size in `Style.FontSize`, the fill and stroke of a nested shape, and `LabelLines` for a label on more than one line",
-        "commit": "843bd63"
-      },
-      {
-        "description": "`StyleSpec.Width` and `Height` fix the size of a class's shapes, and `DiagramSpec.LayoutEngine` writes the layout engine into the diagram's `d2-config`",
-        "commit": "a800290"
-      }
-    ],
-    "changed": [
-      {
-        "description": "`generate` keeps line breaks in labels: D2 gets a double-quoted string with `\\n`, and Mermaid `<br/>`. Labels on one line are written as before",
-        "commit": "ad601c6"
-      }
-    ],
-    "fixed": [
-      {
-        "description": "The parser reads diagrams whose elements have classes, where D2 writes the classes after the base64 ID; such a diagram parsed with no nodes or edges",
-        "commit": "843bd63"
-      },
-      {
-        "description": "Edge paths follow curves and rounded corners (C, S, Q, T, H, and V), not only M and L points",
-        "commit": "8bad4b4"
-      },
-      {
-        "description": "`learn` no longer fails on a parsed node with a fill or stroke",
-        "commit": "e55fa56"
-      }
-    ],
-    "documentation": [
-      {
-        "description": "A legibility guide, and the generate guide on line breaks in labels, shape sizes, and the layout engine"
-      }
-    ]
-  },
   "releases": [
+    {
+      "version": "v0.6.0",
+      "date": "2026-11-12",
+      "highlights": [
+        {
+          "description": "`d2vision legibility` and the `legibility` package check whether a diagram's labels can be read on a Word page, a slide, or a screen, and find arrows drawn over boxes, and say what would fix both"
+        },
+        {
+          "description": "`generate` keeps line breaks in labels, fixes a class's box size, and can name the layout engine in the diagram"
+        },
+        {
+          "description": "The parser reads diagrams that give elements classes, and records each label's font size and lines"
+        }
+      ],
+      "added": [
+        {
+          "description": "`legibility`: `Analyze` fits a parsed diagram to a target, keeping its shape, and reports each label's size as shown, the labels below the target's minimum, the largest readable size, and advice; built-in targets for Word portrait and landscape, tabloid, a 16:9 slide, and a browser window; `Wrap` breaks a label into lines",
+          "commit": "bbf7f57"
+        },
+        {
+          "description": "`d2vision legibility`: check every built-in target, chosen ones, or a custom area, as text, JSON, or TOON, with `--check` to fail when a label is too small",
+          "commit": "c0b258e"
+        },
+        {
+          "description": "`legibility.Crossings` lists arrows drawn over boxes they do not join; reports carry them, `Report.Clear` is false when there are any, and `d2vision legibility --check` fails on them",
+          "commit": "7a5f454"
+        },
+        {
+          "description": "Parsed nodes carry their label's font size in `Style.FontSize`, the fill and stroke of a nested shape, and `LabelLines` for a label on more than one line",
+          "commit": "843bd63"
+        },
+        {
+          "description": "`StyleSpec.Width` and `Height` fix the size of a class's shapes, and `DiagramSpec.LayoutEngine` writes the layout engine into the diagram's `d2-config`",
+          "commit": "a800290"
+        }
+      ],
+      "changed": [
+        {
+          "description": "`generate` keeps line breaks in labels: D2 gets a double-quoted string with `\\n`, and Mermaid `<br/>`. Labels on one line are written as before",
+          "commit": "ad601c6"
+        }
+      ],
+      "fixed": [
+        {
+          "description": "The parser reads diagrams whose elements have classes, where D2 writes the classes after the base64 ID; such a diagram parsed with no nodes or edges",
+          "commit": "843bd63"
+        },
+        {
+          "description": "Edge paths follow curves and rounded corners (C, S, Q, T, H, and V), not only M and L points",
+          "commit": "8bad4b4"
+        },
+        {
+          "description": "`learn` no longer fails on a parsed node with a fill or stroke",
+          "commit": "e55fa56"
+        }
+      ],
+      "documentation": [
+        {
+          "description": "A legibility guide, and the generate guide on line breaks in labels",
+          "commit": "ba4f1a8"
+        },
+        {
+          "description": "The legibility guide on arrows drawn over boxes, and the generate guide on shape sizes and the layout engine",
+          "commit": "fdeac95"
+        },
+        {
+          "description": "The legibility package, `Node.LabelLines`, and the new `StyleSpec` and `DiagramSpec` fields in the API reference",
+          "commit": "69f756d"
+        },
+        {
+          "description": "Release notes for v0.6.0",
+          "commit": "776b9c8"
+        }
+      ],
+      "build": [
+        {
+          "description": "chromedp v0.23.0",
+          "commit": "3a30174"
+        },
+        {
+          "description": "cdproto v0.160.0",
+          "commit": "0b1a6b4"
+        },
+        {
+          "description": "Indirect dependencies updated",
+          "commit": "60ca7ec"
+        }
+      ]
+    },
     {
       "version": "v0.5.0",
       "date": "2026-11-01",
