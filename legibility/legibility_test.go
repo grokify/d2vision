@@ -145,3 +145,51 @@ func TestAnalyzeRenderedSVG(t *testing.T) {
 		t.Errorf("a small diagram should be readable on a Word page: %+v", reports[0])
 	}
 }
+
+// A grid draws an arrow straight over the box between its ends; ELK routes it
+// around.
+func TestCrossings(t *testing.T) {
+	grid, err := d2vision.ParseFile("../testdata/crossing-grid.svg")
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := legibility.Crossings(grid)
+	if len(got) != 1 || got[0].From != "a" || got[0].To != "c" || got[0].Node != "b" {
+		t.Fatalf("grid crossings = %+v, want a -> c over b", got)
+	}
+	r, err := legibility.Analyze(grid, target(t, "screen"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !r.Readable || r.Clear() || len(r.Advice) != 1 || !strings.Contains(r.Advice[0], "1 arrow is drawn over a box") {
+		t.Errorf("report = %+v", r)
+	}
+
+	elk, err := d2vision.ParseFile("../testdata/crossing-elk.svg")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := legibility.Crossings(elk); len(got) != 0 {
+		t.Errorf("elk crossings = %+v, want none", got)
+	}
+}
+
+// A segment that only runs along a box's edge does not cross it.
+func TestTouchingIsNotCrossing(t *testing.T) {
+	d := &d2vision.Diagram{
+		ViewBox: d2vision.Bounds{Width: 300, Height: 100},
+		Nodes: []d2vision.Node{
+			{ID: "a", Bounds: d2vision.Bounds{X: 0, Y: 0, Width: 50, Height: 50}},
+			{ID: "b", Bounds: d2vision.Bounds{X: 100, Y: 0, Width: 50, Height: 50}},
+			{ID: "c", Bounds: d2vision.Bounds{X: 200, Y: 0, Width: 50, Height: 50}},
+		},
+		Edges: []d2vision.Edge{
+			{ID: "(a -> c)[0]", Source: "a", Target: "c", Path: []d2vision.Point{{X: 50, Y: 50}, {X: 200, Y: 50}}},
+			{ID: "(a -> c)[1]", Source: "a", Target: "c", Path: []d2vision.Point{{X: 50, Y: 25}, {X: 200, Y: 25}}},
+		},
+	}
+	got := legibility.Crossings(d)
+	if len(got) != 1 || got[0].Edge != "(a -> c)[1]" || got[0].Node != "b" {
+		t.Errorf("crossings = %+v", got)
+	}
+}

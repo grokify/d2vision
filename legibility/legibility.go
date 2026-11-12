@@ -111,9 +111,16 @@ type Report struct {
 	Shrink float64 `json:"shrink"`
 	// LongestLine is the most characters on one line of any label.
 	LongestLine int `json:"longestLine"`
+	// Crossings are the arrows drawn over boxes they do not join. They do
+	// not depend on the target.
+	Crossings []Crossing `json:"crossings,omitempty"`
 	// Advice says what would make the diagram readable, most effective first.
 	Advice []string `json:"advice,omitempty"`
 }
+
+// Clear reports whether every label is large enough and no arrow is drawn
+// over a box.
+func (r *Report) Clear() bool { return r.Readable && len(r.Crossings) == 0 }
 
 // Line lengths, in characters, that suit a label in a box. Longer lines make
 // wide boxes, and a wide diagram shrinks on a page.
@@ -134,7 +141,7 @@ func Analyze(d *d2vision.Diagram, t Target) (*Report, error) {
 	if w <= 0 || h <= 0 {
 		return nil, fmt.Errorf("legibility: the diagram has no size")
 	}
-	r := &Report{Target: t, Width: w, Height: h}
+	r := &Report{Target: t, Width: w, Height: h, Crossings: Crossings(d)}
 	areaW, areaH := t.WidthIn*pointsPerInch, t.HeightIn*pointsPerInch
 	r.Scale, r.LimitedBy = areaW/w, "width"
 	if s := areaH / h; s < r.Scale {
@@ -145,6 +152,7 @@ func Analyze(d *d2vision.Diagram, t Target) (*Report, error) {
 	r.Labels = len(labels)
 	if len(labels) == 0 {
 		r.Readable = true
+		r.Advice = crossingAdvice(r)
 		return r, nil
 	}
 	sort.SliceStable(labels, func(i, j int) bool { return labels[i].ShownPt < labels[j].ShownPt })
@@ -167,7 +175,21 @@ func Analyze(d *d2vision.Diagram, t Target) (*Report, error) {
 	if !r.Readable {
 		r.Advice = advise(r, labels[0])
 	}
+	r.Advice = append(r.Advice, crossingAdvice(r)...)
 	return r, nil
+}
+
+// crossingAdvice says how to keep arrows off boxes, when any are drawn over.
+func crossingAdvice(r *Report) []string {
+	n := len(r.Crossings)
+	if n == 0 {
+		return nil
+	}
+	what := fmt.Sprintf("%d arrows are drawn over boxes they do not join", n)
+	if n == 1 {
+		what = "1 arrow is drawn over a box it does not join"
+	}
+	return []string{what + ". Lay the diagram out with an engine that routes arrows around boxes, such as ELK (d2 --layout elk), rather than a grid, which draws them straight."}
 }
 
 // AnalyzeAll reports on every target given, in order.

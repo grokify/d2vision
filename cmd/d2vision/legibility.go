@@ -31,7 +31,8 @@ The diagram is scaled to fit each target, keeping its shape, and every label is
 measured at the size it is shown. A label smaller than the target's minimum is
 too small. For a diagram that is not readable, the report says how many times
 too large it is and what would help: wrapping labels, fewer columns or rows, a
-larger font, splitting it, or a target it already fits.
+larger font, splitting it, or a target it already fits. It also lists arrows
+drawn over boxes they do not join, which a layout that routes arrows avoids.
 
 Targets (minimum label size):
   docx-portrait       Word, US Letter portrait, 6.5 x 9 in (9 pt)
@@ -66,7 +67,7 @@ func init() {
 	legibilityCmd.Flags().StringSliceVarP(&legibilityTargets, "target", "t", nil,
 		"Target to check, repeatable: "+strings.Join(legibility.TargetNames(), ", ")+" (default: all)")
 	legibilityCmd.Flags().StringVarP(&legibilityFormat, "format", "f", "text", "Output format: text, toon, json")
-	legibilityCmd.Flags().BoolVar(&legibilityCheck, "check", false, "Exit with status 1 if the diagram is not readable on a target")
+	legibilityCmd.Flags().BoolVar(&legibilityCheck, "check", false, "Exit with status 1 if a label is too small on a target or an arrow is drawn over a box")
 	legibilityCmd.Flags().Float64Var(&legibilityWidth, "width", 0, "Width of a custom target, in inches")
 	legibilityCmd.Flags().Float64Var(&legibilityHeight, "height", 0, "Height of a custom target, in inches")
 	legibilityCmd.Flags().Float64Var(&legibilityMinFont, "min-font", 9, "Smallest readable label on a custom target, in points")
@@ -107,7 +108,7 @@ func runLegibility(cmd *cobra.Command, args []string) error {
 
 	if legibilityCheck {
 		for _, r := range reports {
-			if !r.Readable {
+			if !r.Clear() {
 				os.Exit(1)
 			}
 		}
@@ -160,6 +161,11 @@ func formatLegibility(path string, reports []*legibility.Report, show int) strin
 		if !r.Readable {
 			mark = fmt.Sprintf("✗ %d of %d labels too small", len(r.TooSmall), r.Labels)
 		}
+		if n := len(r.Crossings); n == 1 {
+			mark += "; ✗ 1 arrow over a box"
+		} else if n > 1 {
+			mark += fmt.Sprintf("; ✗ %d arrows over boxes", n)
+		}
 		fmt.Fprintf(&w, "%s (%s, from %.0f pt): %s\n", r.Target.Name, r.Target.Description, r.Target.MinFontPt, mark)
 		fmt.Fprintf(&w, "  shown at %.0f%% (fits the %s); smallest label %.1f pt, median %.1f pt\n",
 			r.Scale*100*4/3, r.LimitedBy, r.SmallestPt, r.MedianPt)
@@ -169,6 +175,13 @@ func formatLegibility(path string, reports []*legibility.Report, show int) strin
 				break
 			}
 			fmt.Fprintf(&w, "  - %s: %.1f pt (%q)\n", l.ID, l.ShownPt, truncate(l.Text, 50))
+		}
+		for i, c := range r.Crossings {
+			if i == show {
+				fmt.Fprintf(&w, "  … and %d more arrows\n", len(r.Crossings)-show)
+				break
+			}
+			fmt.Fprintf(&w, "  - arrow %s -> %s over %s\n", c.From, c.To, c.Node)
 		}
 		for _, a := range r.Advice {
 			fmt.Fprintf(&w, "  → %s\n", a)
