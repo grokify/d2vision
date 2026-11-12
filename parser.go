@@ -766,24 +766,122 @@ func (p *Parser) extractPath(g svgGroup) []Point {
 	return nil
 }
 
-// parseSVGPath parses an SVG path d attribute into coordinate points.
-// This is a simplified parser that handles M (moveto) and L (lineto) commands.
+// parseSVGPath parses an SVG path d attribute into points along the path. It
+// reads the absolute commands D2 writes: M and L, H and V, cubic curves C and
+// S, and quadratic curves Q and T, with a curve sampled at several points so
+// the points follow its shape. Z and relative commands are ignored.
 func parseSVGPath(d string) []Point {
+	tokens := pathTokenPattern.FindAllString(d, -1)
 	var points []Point
-
-	coordPattern := regexp.MustCompile(`[ML]\s*([-\d.]+)[,\s]+([-\d.]+)`)
-	matches := coordPattern.FindAllStringSubmatch(d, -1)
-
-	for _, match := range matches {
-		x, err1 := strconv.ParseFloat(match[1], 64)
-		y, err2 := strconv.ParseFloat(match[2], 64)
-		if err1 == nil && err2 == nil {
-			points = append(points, Point{X: x, Y: y})
+	var cur, ctrl Point
+	cmd := ""
+	num := func(i int) (float64, bool) {
+		if i >= len(tokens) {
+			return 0, false
+		}
+		f, err := strconv.ParseFloat(tokens[i], 64)
+		return f, err == nil
+	}
+	nums := func(i, n int) ([]float64, bool) {
+		out := make([]float64, n)
+		for k := range n {
+			f, ok := num(i + k)
+			if !ok {
+				return nil, false
+			}
+			out[k] = f
+		}
+		return out, true
+	}
+	cubic := func(p1, p2, p3 Point) {
+		p0 := cur
+		for k := 1; k <= curveSamples; k++ {
+			t := float64(k) / curveSamples
+			u := 1 - t
+			points = append(points, Point{
+				X: u*u*u*p0.X + 3*u*u*t*p1.X + 3*u*t*t*p2.X + t*t*t*p3.X,
+				Y: u*u*u*p0.Y + 3*u*u*t*p1.Y + 3*u*t*t*p2.Y + t*t*t*p3.Y,
+			})
+		}
+		cur, ctrl = p3, p2
+	}
+	for i := 0; i < len(tokens); {
+		if c := tokens[i]; len(c) == 1 && strings.Contains("MLHVCSQTZmlhvcsqtz", c) {
+			cmd = c
+			i++
+			continue
+		}
+		switch cmd {
+		case "M", "L":
+			v, ok := nums(i, 2)
+			if !ok {
+				return points
+			}
+			cur = Point{X: v[0], Y: v[1]}
+			ctrl = cur
+			points = append(points, cur)
+			i += 2
+		case "H", "V":
+			v, ok := nums(i, 1)
+			if !ok {
+				return points
+			}
+			if cmd == "H" {
+				cur.X = v[0]
+			} else {
+				cur.Y = v[0]
+			}
+			ctrl = cur
+			points = append(points, cur)
+			i++
+		case "C":
+			v, ok := nums(i, 6)
+			if !ok {
+				return points
+			}
+			cubic(Point{X: v[0], Y: v[1]}, Point{X: v[2], Y: v[3]}, Point{X: v[4], Y: v[5]})
+			i += 6
+		case "S":
+			v, ok := nums(i, 4)
+			if !ok {
+				return points
+			}
+			p1 := Point{X: 2*cur.X - ctrl.X, Y: 2*cur.Y - ctrl.Y}
+			cubic(p1, Point{X: v[0], Y: v[1]}, Point{X: v[2], Y: v[3]})
+			i += 4
+		case "Q":
+			v, ok := nums(i, 4)
+			if !ok {
+				return points
+			}
+			q := Point{X: v[0], Y: v[1]}
+			end := Point{X: v[2], Y: v[3]}
+			cubic(Point{X: cur.X + 2.0/3*(q.X-cur.X), Y: cur.Y + 2.0/3*(q.Y-cur.Y)},
+				Point{X: end.X + 2.0/3*(q.X-end.X), Y: end.Y + 2.0/3*(q.Y-end.Y)}, end)
+			ctrl = q
+			i += 4
+		case "T":
+			v, ok := nums(i, 2)
+			if !ok {
+				return points
+			}
+			cur = Point{X: v[0], Y: v[1]}
+			ctrl = cur
+			points = append(points, cur)
+			i += 2
+		default:
+			// Z, a relative command, or a number with no command.
+			i++
 		}
 	}
-
 	return points
 }
+
+// curveSamples is how many points a curve is sampled at.
+const curveSamples = 8
+
+// pathTokenPattern splits a path into commands and numbers.
+var pathTokenPattern = regexp.MustCompile(`[A-Za-z]|-?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?`)
 
 // extractNodeStyle extracts visual styling from a node's SVG elements.
 func (p *Parser) extractNodeStyle(g svgGroup) NodeStyle {
