@@ -11,6 +11,11 @@ type DiagramSpec struct {
 	// HorizontalGap and VerticalGap are the space between grid cells, in pixels.
 	HorizontalGap int `json:"horizontalGap,omitempty" yaml:"horizontalGap,omitempty"`
 	VerticalGap   int `json:"verticalGap,omitempty" yaml:"verticalGap,omitempty"`
+	// LayoutEngine names the D2 layout engine the diagram is drawn with, such
+	// as "elk", which routes edges around shapes, or "dagre". It is written
+	// into the diagram's d2-config, so d2 uses it unless told otherwise.
+	// Empty leaves the choice to d2. Mermaid ignores it.
+	LayoutEngine string `json:"layoutEngine,omitempty" yaml:"layoutEngine,omitempty"`
 
 	// Classes are named styles shared by nodes, containers, and edges that name
 	// them with Class. They are written as D2 classes and as Mermaid classDefs.
@@ -91,6 +96,11 @@ type StyleSpec struct {
 	Opacity      *float64 `json:"opacity,omitempty" yaml:"opacity,omitempty"`
 	FontColor    string   `json:"fontColor,omitempty" yaml:"fontColor,omitempty"`
 	Bold         *bool    `json:"bold,omitempty" yaml:"bold,omitempty"`
+	// Width and Height fix a shape's size in pixels, so the boxes of a class
+	// line up. A label that does not fit wraps or overflows, so wrap long
+	// labels to suit the width. Mermaid ignores them.
+	Width  *int `json:"width,omitempty" yaml:"width,omitempty"`
+	Height *int `json:"height,omitempty" yaml:"height,omitempty"`
 }
 
 // BoolPtr returns a pointer to a bool value.

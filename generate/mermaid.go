@@ -238,12 +238,15 @@ func mermaidSafe(s string) string {
 	}, s)
 }
 
-// mermaidText escapes text for use inside a quoted Mermaid label.
+// mermaidText escapes text for use inside a quoted Mermaid label. A line
+// break in the text becomes <br/>.
 func mermaidText(s string) string {
-	s = strings.Join(strings.Fields(s), " ")
-	s = strings.ReplaceAll(s, "&", "#amp;")
-	s = strings.ReplaceAll(s, `"`, "#quot;")
-	s = strings.ReplaceAll(s, "<", "#lt;")
-	s = strings.ReplaceAll(s, ">", "#gt;")
-	return s
+	lines := labelLines(s)
+	for i, l := range lines {
+		l = strings.ReplaceAll(l, "&", "#amp;")
+		l = strings.ReplaceAll(l, `"`, "#quot;")
+		l = strings.ReplaceAll(l, "<", "#lt;")
+		lines[i] = strings.ReplaceAll(l, ">", "#gt;")
+	}
+	return strings.Join(lines, "<br/>")
 }

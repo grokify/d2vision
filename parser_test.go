@@ -670,3 +670,77 @@ func TestMightBeBase64(t *testing.T) {
 		}
 	}
 }
+
+// TestParseClassedSVG reads an SVG where D2 writes each element's classes
+// after its base64 ID, and a label with a line break as one tspan per line.
+func TestParseClassedSVG(t *testing.T) {
+	diagram, err := ParseFile("testdata/classed.svg")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(diagram.Nodes) != 3 || len(diagram.Edges) != 1 {
+		t.Fatalf("nodes = %d, edges = %d, want 3 and 1", len(diagram.Nodes), len(diagram.Edges))
+	}
+	a := diagram.NodeByID("stage.a")
+	if a == nil {
+		t.Fatal("node stage.a not found")
+	}
+	if a.Label != "First line here second line" {
+		t.Errorf("label = %q", a.Label)
+	}
+	if len(a.LabelLines) != 2 || a.LabelLines[1] != "second line" {
+		t.Errorf("label lines = %q", a.LabelLines)
+	}
+	if a.Style.FontSize != 20 {
+		t.Errorf("font size = %v, want 20", a.Style.FontSize)
+	}
+	if a.Bounds.Width == 0 || a.Bounds.Height == 0 {
+		t.Errorf("bounds = %v", a.Bounds)
+	}
+	if b := diagram.NodeByID("b"); b == nil || b.Style.FontSize != 16 || b.LabelLines != nil {
+		t.Errorf("node b = %+v", b)
+	}
+}
+
+func TestFontSize(t *testing.T) {
+	for style, want := range map[string]float64{
+		"text-anchor:middle;font-size:16px": 16,
+		"font-size: 22.5px":                 22.5,
+		"text-anchor:middle":                0,
+		"":                                  0,
+	} {
+		if got := fontSize(style); got != want {
+			t.Errorf("fontSize(%q) = %v, want %v", style, got, want)
+		}
+	}
+}
+
+// A path is read through lines, rounded corners, and curves, so its points
+// follow the line D2 draws.
+func TestParseSVGPathFollowsCurves(t *testing.T) {
+	// ELK draws a corner as S between two lines.
+	elk := parseSVGPath("M 137 1313 L 137 1129 S 137 1119 147 1119 L 717 1119")
+	if first, last := elk[0], elk[len(elk)-1]; first != (Point{X: 137, Y: 1313}) || last != (Point{X: 717, Y: 1119}) {
+		t.Errorf("elk path runs %v to %v", first, last)
+	}
+	if len(elk) != 2+curveSamples+1 {
+		t.Errorf("elk path has %d points, want %d", len(elk), 2+curveSamples+1)
+	}
+	// Dagre draws a curve with C; its midpoint is on the curve, not at a
+	// control point.
+	c := parseSVGPath("M0,0 C0,100 100,100 100,0")
+	mid := c[curveSamples/2]
+	if mid.X != 50 || mid.Y != 75 {
+		t.Errorf("curve midpoint = %v, want (50, 75)", mid)
+	}
+	hv := parseSVGPath("M 10 10 H 50 V 40 Z")
+	if len(hv) != 3 || hv[2] != (Point{X: 50, Y: 40}) {
+		t.Errorf("H and V: %v", hv)
+	}
+	if q := parseSVGPath("M 0 0 Q 50 100 100 0"); q[len(q)-1] != (Point{X: 100, Y: 0}) {
+		t.Errorf("Q ends at %v", q[len(q)-1])
+	}
+	if got := parseSVGPath("M 1 2 L"); len(got) != 1 {
+		t.Errorf("truncated path: %v", got)
+	}
+}
