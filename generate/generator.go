@@ -411,11 +411,22 @@ func (g *Generator) ref(path string) string {
 }
 
 // label writes label text so D2 reads it literally. Plain text is written as
-// is. Anything else is written in single quotes, where D2 does no
-// substitution and no escaping other than doubling a single quote. A line
-// break becomes a space.
+// is. Anything else on one line is written in single quotes, where D2 does no
+// substitution and no escaping other than doubling a single quote. Text with
+// line breaks keeps them: it is written in double quotes with each break as
+// \n, and a backslash, double quote, or dollar sign escaped so D2 neither
+// ends the string nor substitutes a variable. Spaces within a line collapse,
+// and blank lines are dropped.
 func (g *Generator) label(text string) string {
-	text = strings.Join(strings.Fields(text), " ")
+	lines := labelLines(text)
+	if len(lines) > 1 {
+		r := strings.NewReplacer(`\`, `\\`, `"`, `\"`, `$`, `\$`)
+		for i, l := range lines {
+			lines[i] = r.Replace(l)
+		}
+		return `"` + strings.Join(lines, `\n`) + `"`
+	}
+	text = strings.Join(lines, "")
 	if text == "" {
 		return `""`
 	}
@@ -438,4 +449,16 @@ func plainLabel(s string) bool {
 		}
 	}
 	return true
+}
+
+// labelLines splits label text into its lines, collapsing spaces within each
+// line and dropping blank lines.
+func labelLines(text string) []string {
+	var lines []string
+	for _, l := range strings.Split(text, "\n") {
+		if l = strings.Join(strings.Fields(l), " "); l != "" {
+			lines = append(lines, l)
+		}
+	}
+	return lines
 }
