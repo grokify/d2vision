@@ -196,8 +196,7 @@ func nodeToNodeSpec(node *d2vision.Node) generate.NodeSpec {
 
 	// Extract style if present
 	if node.Style.Fill != "" || node.Style.Stroke != "" {
-		spec.Style.Fill = node.Style.Fill
-		spec.Style.Stroke = node.Style.Stroke
+		spec.Style = &generate.StyleSpec{Fill: node.Style.Fill, Stroke: node.Style.Stroke}
 	}
 
 	return spec
