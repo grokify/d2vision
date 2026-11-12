@@ -11,7 +11,7 @@
   "unreleased": {
     "highlights": [
       {
-        "description": "`d2vision legibility` and the `legibility` package check whether a diagram's labels can be read on a Word page, a slide, or a screen, and say what would make them readable"
+        "description": "`d2vision legibility` and the `legibility` package check whether a diagram's labels can be read on a Word page, a slide, or a screen, and find arrows drawn over boxes, and say what would fix both"
       }
     ],
     "added": [
@@ -24,8 +24,16 @@
         "commit": "c0b258e"
       },
       {
+        "description": "`legibility.Crossings` lists arrows drawn over boxes they do not join; reports carry them, `Report.Clear` is false when there are any, and `d2vision legibility --check` fails on them",
+        "commit": "7a5f454"
+      },
+      {
         "description": "Parsed nodes carry their label's font size in `Style.FontSize`, the fill and stroke of a nested shape, and `LabelLines` for a label on more than one line",
         "commit": "843bd63"
+      },
+      {
+        "description": "`StyleSpec.Width` and `Height` fix the size of a class's shapes, and `DiagramSpec.LayoutEngine` writes the layout engine into the diagram's `d2-config`",
+        "commit": "a800290"
       }
     ],
     "changed": [
@@ -40,13 +48,17 @@
         "commit": "843bd63"
       },
       {
+        "description": "Edge paths follow curves and rounded corners (C, S, Q, T, H, and V), not only M and L points",
+        "commit": "8bad4b4"
+      },
+      {
         "description": "`learn` no longer fails on a parsed node with a fill or stroke",
         "commit": "e55fa56"
       }
     ],
     "documentation": [
       {
-        "description": "A legibility guide, and the generate guide on line breaks in labels"
+        "description": "A legibility guide, and the generate guide on line breaks in labels, shape sizes, and the layout engine"
       }
     ]
   },

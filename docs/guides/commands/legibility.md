@@ -16,7 +16,7 @@ d2vision legibility <file.svg> [flags]
 | `-t, --target` | all | Target to check, repeatable |
 | `--width`, `--height` | | A custom target's area, in inches |
 | `--min-font` | `9` | A custom target's smallest readable label, in points |
-| `--check` | `false` | Exit with status 1 if a label is too small on a target |
+| `--check` | `false` | Exit with status 1 if a label is too small on a target or an arrow is drawn over a box |
 | `--show` | `5` | Too-small labels to list per target in text output |
 | `-f, --format` | `text` | Output format: text, toon, json |
 
@@ -43,6 +43,12 @@ For a diagram that is not readable, the advice says:
 - To use fewer columns, or fewer items in each column
 - To raise the font size, when the diagram is less than one and a half times too large; otherwise to split it
 - Which other targets it is already readable on
+
+It also lists every arrow drawn over a box that is neither of its ends, which
+hides the box and makes the arrow hard to follow. A grid draws arrows straight,
+over whatever is in the way; a layout engine that routes them, such as ELK
+(`d2 --layout elk`), draws them around boxes. `--check` fails on either a label
+that is too small or an arrow over a box.
 
 Edge labels are not counted, since the SVG does not record their size.
 
@@ -76,9 +82,10 @@ import (
 d, err := d2vision.ParseFile("diagram.svg")
 t, _ := legibility.TargetByName("docx-portrait")
 report, err := legibility.Analyze(d, t)
-if !report.Readable {
+if !report.Clear() {
     fmt.Println(report.Advice)
 }
+crossings := legibility.Crossings(d) // arrows over boxes, on any target
 
 label := legibility.Wrap("Deliver capacity building trainings and workshops", 28)
 ```
