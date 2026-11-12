@@ -19,6 +19,7 @@ go get github.com/grokify/d2vision
 | `d2vision/convert` | Mermaid/PlantUML conversion |
 | `d2vision/card` | Datasheet-style infographic cards (JSON to animated SVG) |
 | `d2vision/export` | Headless-Chrome capture of SVG to PNG/frames, and GIF encoding |
+| `d2vision/legibility` | Whether a diagram's labels can be read on a page, slide, or screen, and arrows drawn over boxes |
 
 ## Parsing SVGs
 
@@ -67,15 +68,19 @@ type Diagram struct {
 
 ```go
 type Node struct {
-    ID       string    `json:"id"`
-    Label    string    `json:"label,omitempty"`
-    Shape    ShapeType `json:"shape"`
+    ID         string    `json:"id"`
+    Label      string    `json:"label,omitempty"`
+    LabelLines []string  `json:"labelLines,omitempty"` // when the label has more than one line
+    Shape      ShapeType `json:"shape"`
     Bounds   Bounds    `json:"bounds"`
     Parent   string    `json:"parent,omitempty"`
     Children []string  `json:"children,omitempty"`
     Style    NodeStyle `json:"style,omitempty"`
 }
 ```
+
+`Style.FontSize` is the label's font size in pixels, read from the SVG.
+`Label` joins a multi-line label's lines with spaces; `LabelLines` keeps them.
 
 ### Edge Type
 
@@ -186,6 +191,7 @@ func main() {
 
 ```go
 type DiagramSpec struct {
+    LayoutEngine string         `json:"layoutEngine,omitempty"` // written into d2-config, e.g. "elk"
     Direction   string          `json:"direction,omitempty"`
     GridColumns int             `json:"gridColumns,omitempty"`
     GridRows    int             `json:"gridRows,omitempty"`
@@ -273,6 +279,10 @@ type StyleSpec struct {
     BorderRadius *int     `json:"borderRadius,omitempty"`
     FontSize     *int     `json:"fontSize,omitempty"`
     Opacity      *float64 `json:"opacity,omitempty"`
+    FontColor    string   `json:"fontColor,omitempty"`
+    Bold         *bool    `json:"bold,omitempty"`
+    Width        *int     `json:"width,omitempty"`  // fixes the shape's width
+    Height       *int     `json:"height,omitempty"` // fixes the shape's height
 }
 
 // Helper functions
@@ -350,6 +360,31 @@ opts := &render.Options{
 
 svg, err := r.RenderSVG(ctx, d2Code, opts)
 ```
+
+## Legibility
+
+The `legibility` package checks a parsed diagram where it will be shown. It
+does not link the D2 engine.
+
+```go
+import "github.com/grokify/d2vision/legibility"
+
+d, err := d2vision.ParseFile("diagram.svg")
+page, _ := legibility.TargetByName("docx-portrait")
+r, err := legibility.Analyze(d, page)
+// r.SmallestPt: the smallest label as shown, in points
+// r.TooSmall:   labels under the target's minimum
+// r.Crossings:  arrows drawn over boxes they do not join
+// r.Clear():    labels large enough and no crossings
+// r.Advice:     what would help
+
+wrapped := legibility.Wrap(longLabel, 26) // break a label into lines
+```
+
+`legibility.Targets` lists the built-in targets: `docx-portrait`,
+`docx-landscape`, `tabloid-landscape`, `slide-16x9`, and `screen`. A `Target`
+with your own size and minimum label works the same way. See the
+[legibility command](commands/legibility.md).
 
 ## Infographic Cards
 
